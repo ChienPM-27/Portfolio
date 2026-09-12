@@ -1,16 +1,23 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --surface: #121215;
-  --surface-muted: #18181b;
-  --surface-border: #27272a;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-violet: #8b5cf6;
+  /* Dark HSL Palette */
+  --bg: 240 10% 3.9%;
+  --surface: 240 6% 6.5%;
+  --surface-muted: 240 5% 10%;
+  --text: 0 0% 98%;
+  --muted: 240 5% 65%;
+  --stroke: 240 5.9% 15%;
+
+  /* Color aliases */
+  --background: hsl(var(--bg));
+  --foreground: hsl(var(--text));
+
+  /* Signature Accent Gradient */
+  --accent-start: #89AACC;
+  --accent-end: #4E85BF;
 }
 
 * {
@@ -56,6 +63,34 @@ body {
 
 /* Custom Selection */
 ::selection {
-  background: rgba(6, 182, 212, 0.25);
-  color: #38bdf8;
+  background: rgba(137, 170, 204, 0.25);
+  color: #89AACC;
+}
+
+/* Utilities */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.accent-gradient {
+  background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);
+}
+
+.accent-gradient-text {
+  background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -1,5 +1,21 @@
-﻿import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter, Instrument_Serif } from "next/font/google";
+import { LoadingScreen } from "@/components/shell/LoadingScreen";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Pham Minh Chien | AI Engineer",
@@ -36,8 +52,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-background text-foreground min-h-screen selection:bg-cyan-500/20 selection:text-cyan-400">
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${instrumentSerif.variable}`}
+    >
+      <body className="bg-background text-foreground min-h-screen selection:bg-cyan-500/20 selection:text-cyan-400 font-sans">
+        <LoadingScreen />
         {children}
       </body>
     </html>

@@ -1,19 +1,149 @@
-﻿import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import { profile } from "@/data/profile";
+import { triggerObfuscatedMailto } from "@/lib/contact-utils";
+import { useGSAP } from "@/lib/gsap";
+import gsap from "gsap";
+import { isReducedMotionPreferred } from "@/lib/scroll-utils";
+import { Github, Mail, ArrowUpRight } from "lucide-react";
+
+const MARQUEE_ITEMS = [
+  "COMPUTER VISION PIPELINES",
+  "SINGLE-IMAGE 3D RECONSTRUCTION",
+  "HIGH-THROUGHPUT GPU INFERENCE",
+  "PYTORCH & FASTAPI BACKENDS",
+  "REAL-TIME POINT CLOUD & MESH GENERATION",
+  "SAI GON UNIVERSITY // 2024–2029",
+];
+
+const STATS = [
+  {
+    label: "GPU Utilization",
+    value: "94.2%",
+    subtext: "Batch Tensor Optimization",
+  },
+  {
+    label: "Cloud Inference Latency",
+    value: "< 45ms",
+    subtext: "Async GPU Pipeline",
+  },
+  {
+    label: "Academic Standing",
+    value: "Sai Gon University",
+    subtext: "2024–2029 • B.Eng IT",
+  },
+  {
+    label: "System Architecture",
+    value: "3 Projects",
+    subtext: "Modular 3D Scenes",
+  },
+];
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (isReducedMotionPreferred()) return;
+    const marquee = marqueeRef.current;
+    if (!marquee) return;
+
+    const anim = gsap.to(marquee, {
+      xPercent: -50,
+      repeat: -1,
+      duration: 28,
+      ease: "none",
+    });
+
+    return () => {
+      anim.kill();
+    };
+  }, []);
 
   return (
-    <footer className="border-t border-surface-border/40 py-8 px-6 bg-zinc-950/60 text-xs font-mono text-zinc-500">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>{profile.name} — Portfolio v1.0</span>
+    <footer className="border-t border-stroke/40 pt-10 pb-8 bg-surface/20 flex flex-col gap-10 overflow-hidden">
+      {/* Infinite Horizontal Marquee Text Loop */}
+      <div className="w-full overflow-hidden border-y border-stroke/40 py-3 sm:py-3.5 bg-surface/40 select-none">
+        <div
+          ref={marqueeRef}
+          className="flex gap-8 whitespace-nowrap will-change-transform w-max"
+        >
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-6 font-mono text-xs sm:text-sm tracking-wider text-text-muted"
+            >
+              <span>{item}</span>
+              <span className="accent-gradient-text font-bold">//</span>
+            </div>
+          ))}
         </div>
-        <div className="text-zinc-600 text-center sm:text-right">
-          <span>{profile.education.institution} • {profile.location}</span>
+      </div>
+
+      {/* Verified Technical Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-6 w-full">
+        {STATS.map((stat, i) => (
+          <div
+            key={i}
+            className="p-4 rounded-xl bg-surface/70 border border-stroke hover:border-zinc-700/80 transition-all flex flex-col justify-between gap-2"
+          >
+            <div className="text-xs font-mono text-text-muted">
+              {stat.label}
+            </div>
+            <div className="text-xl sm:text-2xl font-bold font-mono accent-gradient-text tracking-tight">
+              {stat.value}
+            </div>
+            <div className="text-[11px] font-mono text-zinc-500">
+              {stat.subtext}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Availability Beacon and Direct Actions */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto px-6 w-full pt-4 border-t border-stroke/40">
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-800/40 text-emerald-400 text-xs font-mono">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span>Available for Junior / Intern Roles</span>
         </div>
+
+        <div className="flex items-center gap-3">
+          <a
+            href={profile.links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface border border-stroke text-text-muted hover:text-white hover:border-zinc-600 transition-all text-xs font-mono"
+            aria-label="GitHub Profile"
+          >
+            <Github className="w-3.5 h-3.5" />
+            <span>GitHub</span>
+            <ArrowUpRight className="w-3 h-3 text-accent-start" />
+          </a>
+          <button
+            onClick={() =>
+              triggerObfuscatedMailto(
+                profile.links.emailUser,
+                profile.links.emailDomain
+              )
+            }
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface border border-stroke text-text-muted hover:text-white hover:border-zinc-600 transition-all text-xs font-mono"
+            aria-label="Contact via email"
+          >
+            <Mail className="w-3.5 h-3.5 text-accent-start" />
+            <span>Contact</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Baseline Attribution */}
+      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-zinc-500">
+        <span>{profile.name} — Portfolio v1.0</span>
+        <span>
+          {profile.education.institution} • {profile.location}
+        </span>
       </div>
     </footer>
   );

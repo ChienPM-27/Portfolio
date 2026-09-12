@@ -1,4 +1,4 @@
-﻿import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -10,22 +10,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        bg: "hsl(var(--bg) / <alpha-value>)",
         surface: {
-          DEFAULT: "var(--surface)",
-          muted: "var(--surface-muted)",
-          border: "var(--surface-border)",
+          DEFAULT: "hsl(var(--surface) / <alpha-value>)",
+          muted: "hsl(var(--surface-muted) / <alpha-value>)",
+          border: "hsl(var(--stroke) / <alpha-value>)",
         },
+        text: {
+          DEFAULT: "hsl(var(--text) / <alpha-value>)",
+          muted: "hsl(var(--muted) / <alpha-value>)",
+        },
+        stroke: "hsl(var(--stroke) / <alpha-value>)",
         accent: {
+          start: "#89AACC",
+          end: "#4E85BF",
           cyan: "#06b6d4",
           emerald: "#10b981",
           violet: "#8b5cf6",
         },
       },
       fontFamily: {
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "ui-serif", "Georgia", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+      },
+      animation: {
+        "gradient-shift": "gradient-shift 4s ease infinite",
       },
     },
   },

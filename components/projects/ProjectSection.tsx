@@ -13,6 +13,16 @@ interface ProjectSectionProps {
   index: number;
 }
 
+// Khoảng cuộn dành cho reveal (fade/slide vào) — RỘNG hơn bản cũ (35% -> ~65-70% viewport)
+// để mắt kịp thấy chuyển động thay vì "chớp" xong trong 1-2 tick cuộn.
+const REVEAL_START = "top 92%";
+const REVEAL_END = "top 20%";
+
+// Khoảng cuộn cho progress của scene 3D — giữ nguyên, cố tình rộng bằng cả section
+// vì scene cần animate xuyên suốt lúc section đi qua viewport, không chỉ lúc mới vào.
+const SCENE_TRACK_START = "top 85%";
+const SCENE_TRACK_END = "bottom 15%";
+
 export function ProjectSection({ project, index }: ProjectSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
@@ -30,10 +40,12 @@ export function ProjectSection({ project, index }: ProjectSectionProps) {
     () => {
       if (!sectionRef.current) return;
 
-      const trigger = ScrollTrigger.create({
+      // 1) Trigger riêng chỉ để feed progress cho scene 3D — KHÔNG đổi, phạm vi rộng
+      //    xuyên suốt section là đúng ý đồ (khác với trigger reveal bên dưới).
+      const sceneTrigger = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: "top 85%",
-        end: "bottom 15%",
+        start: SCENE_TRACK_START,
+        end: SCENE_TRACK_END,
         scrub: 0.5,
         onUpdate: (self) => {
           setSceneState({
@@ -46,63 +58,48 @@ export function ProjectSection({ project, index }: ProjectSectionProps) {
 
       const reducedMotion = isReducedMotionPreferred();
 
+      // 2) Reveal — GỘP visual + content vào CHUNG 1 timeline + 1 scrollTrigger
+      //    để không bao giờ lệch nhịp, và range rộng hơn để thấy rõ chuyển động.
+      const revealTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: REVEAL_START,
+          end: REVEAL_END,
+          scrub: 0.6,
+          // markers: true, // bật khi cần debug vị trí start/end, nhớ tắt trước khi build
+        },
+      });
+
       if (reducedMotion) {
-        // Accessibility fallback: simple fade without translation
-        gsap.fromTo(
+        // Accessibility fallback: fade đơn giản, không dịch chuyển
+        revealTl.fromTo(
           [visualRef.current, contentRef.current],
           { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 0.6,
-            stagger: 0.2,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "top 50%",
-              scrub: 0.5,
-            },
-          }
+          { opacity: 1, stagger: 0.2, ease: "power1.out" },
+          0
         );
       } else {
-        // Full cinematic directional reveal
-        const enterX = isEven ? -40 : 40;
-        gsap.fromTo(
-          visualRef.current,
-          { opacity: 0, x: enterX },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "top 45%",
-              scrub: 0.6,
-            },
-          }
-        );
+        const enterX = isEven ? -60 : 60; // tăng nhẹ để cảm nhận rõ hơn khi range đã rộng ra
 
-        gsap.fromTo(
-          contentRef.current,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "top 50%",
-              scrub: 0.6,
-            },
-          }
-        );
+        revealTl
+          .fromTo(
+            visualRef.current,
+            { opacity: 0, x: enterX },
+            { opacity: 1, x: 0, ease: "power2.out" },
+            0
+          )
+          .fromTo(
+            contentRef.current,
+            { opacity: 0, y: 60 }, // tăng từ 30 -> 60, dễ nhận ra là có animate
+            { opacity: 1, y: 0, ease: "power2.out" },
+            0
+          );
       }
 
       return () => {
-        trigger.kill();
+        sceneTrigger.kill();
+        revealTl.scrollTrigger?.kill();
+        revealTl.kill();
       };
     },
     { scope: sectionRef }
@@ -115,8 +112,6 @@ export function ProjectSection({ project, index }: ProjectSectionProps) {
       className="relative min-h-[85vh] sm:min-h-[90vh] py-12 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto flex items-center overflow-x-clip"
     >
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        {/* On mobile (<lg): Visual is always order-1 (top), Details is order-2 (bottom) */}
-        {/* On desktop (lg): Alternates left/right based on index */}
         {isEven ? (
           <>
             <div
@@ -162,3 +157,19 @@ export function ProjectSection({ project, index }: ProjectSectionProps) {
     </section>
   );
 }
+
+/**
+ * Thêm 1 lần ở nơi render toàn bộ danh sách ProjectSection (vd trang chủ / layout),
+ * KHÔNG lặp lại trong từng section, để tránh lệch vị trí trigger do layout shift
+ * (Canvas Three.js mount xong / web font load xong mới đúng chiều cao thật):
+ *
+ *   useEffect(() => {
+ *     const refresh = () => ScrollTrigger.refresh();
+ *     if (document.fonts?.ready) document.fonts.ready.then(refresh);
+ *     window.addEventListener("load", refresh);
+ *     return () => window.removeEventListener("load", refresh);
+ *   }, []);
+ *
+ * Nếu vẫn thấy 1-2 section đầu bị "nhảy" thẳng vào trạng thái cuối khi vừa load trang,
+ * gần như chắc chắn là do lỗi này — refresh() sẽ đo lại đúng vị trí sau khi layout ổn định.
+ */

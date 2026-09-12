@@ -1,4 +1,6 @@
-﻿/**
+import { useState, useEffect } from "react";
+
+/**
  * Utility functions for scroll math, easing, and motion accessibility.
  */
 
@@ -24,4 +26,26 @@ export function getPhaseProgress(progress: number, enterEnd: number = 0.2, exitS
   const exit = clamp((p - exitStart) / (1 - exitStart), 0, 1);
   const active = enter * (1 - exit);
   return { p, enter, exit, active };
+}
+
+/**
+ * Hook to detect whether the user has scrolled beyond a vertical threshold.
+ */
+export function useScrollElevation(threshold: number = 20): boolean {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleScroll = () => {
+      const scrolled = window.scrollY > threshold;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [threshold]);
+
+  return isScrolled;
 }
