@@ -1,4 +1,4 @@
-﻿# dependencies
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
@@ -31,6 +31,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# analysis & preview artifacts
+/glee-analysis/
+/glee-preview/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.vercel

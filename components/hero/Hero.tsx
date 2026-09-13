@@ -17,8 +17,10 @@ const VERIFIED_ROLES = [
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
   const roleSublineRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
 
   const [roleIndex, setRoleIndex] = useState(0);
@@ -43,10 +45,20 @@ export function Hero() {
 
       tl.from(titleRef.current, {
         opacity: 0,
-        y: 35,
+        y: 50,
         filter: "blur(12px)",
-        duration: 1.1,
+        duration: 1.2,
       })
+        .from(
+          subtitleRef.current,
+          {
+            opacity: 0,
+            y: 30,
+            filter: "blur(8px)",
+            duration: 0.9,
+          },
+          "-=0.8"
+        )
         .from(
           roleSublineRef.current,
           {
@@ -55,7 +67,7 @@ export function Hero() {
             filter: "blur(8px)",
             duration: 0.9,
           },
-          "-=0.7"
+          "-=0.6"
         )
         .from(
           textRef.current,
@@ -65,7 +77,16 @@ export function Hero() {
             filter: "blur(6px)",
             duration: 0.8,
           },
-          "-=0.6"
+          "-=0.5"
+        )
+        .from(
+          ctaRef.current,
+          {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+          },
+          "-=0.4"
         )
         .from(
           tagsRef.current,
@@ -74,7 +95,7 @@ export function Hero() {
             y: 15,
             duration: 0.7,
           },
-          "-=0.5"
+          "-=0.3"
         );
     },
     { scope: containerRef }
@@ -85,71 +106,76 @@ export function Hero() {
       ref={containerRef}
       className="relative min-h-[92vh] flex flex-col justify-between px-6 pt-32 pb-12 max-w-6xl mx-auto"
     >
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent-start/5 blur-[120px] pointer-events-none rounded-full" />
+      <div className="flex flex-col gap-6 my-auto items-center text-center">
+        {/* Gleec-style uppercase condensed headline */}
+        <h1
+          ref={titleRef}
+          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-medium tracking-[0.08em] uppercase text-hud-white leading-[0.95]"
+        >
+          Pham Minh Chien
+        </h1>
 
-      <div className="flex flex-col gap-6 my-auto">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-surface border border-stroke text-accent-start">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-start animate-ping" />
-            AI Engineering Portfolio
-          </span>
-          <span className="text-xs font-mono text-text-muted hidden sm:inline">
-            // {profile.location}
-          </span>
+        {/* Subtitle */}
+        <div ref={subtitleRef}>
+          <p className="text-base sm:text-lg text-hud-muted max-w-2xl leading-relaxed mx-auto">
+            {profile.positioning}
+          </p>
         </div>
 
-        <div>
-          <h1
-            ref={titleRef}
-            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-text max-w-4xl leading-[1.1]"
-          >
-            Pham Minh <span className="font-serif italic font-normal text-zinc-300">Chien</span>
-          </h1>
-
-          {/* Animated role-cycling subline */}
+        {/* Animated role-cycling subline */}
+        <div
+          ref={roleSublineRef}
+          className="h-8 sm:h-10 flex items-center justify-center overflow-hidden"
+        >
           <div
-            ref={roleSublineRef}
-            className="h-9 sm:h-12 flex items-center overflow-hidden mt-2"
+            className={`flex items-center gap-2 font-display text-lg sm:text-2xl tracking-[0.15em] uppercase transition-all duration-300 ease-out transform ${
+              fadeState === "in"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 blur-sm"
+            }`}
           >
-            <div
-              className={`flex items-center gap-2 text-xl sm:text-3xl md:text-4xl text-text-muted font-light transition-all duration-300 ease-out transform ${
-                fadeState === "in"
-                  ? "opacity-100 translate-y-0 filter-none"
-                  : "opacity-0 -translate-y-2 blur-sm"
-              }`}
-            >
-              <span className="accent-gradient-text font-mono font-normal text-lg sm:text-2xl">
-                //
-              </span>
-              <span className="font-mono tracking-tight text-zinc-300">
-                {VERIFIED_ROLES[roleIndex]}
-              </span>
-            </div>
+            <span className="text-cyber-red font-mono text-sm">//</span>
+            <span className="text-hud-muted">
+              {VERIFIED_ROLES[roleIndex]}
+            </span>
           </div>
         </div>
 
-        <p
-          ref={textRef}
-          className="text-base sm:text-lg text-text-muted max-w-2xl leading-relaxed font-normal"
-        >
-          {profile.positioning}
-        </p>
+        {/* Gleec-style pill CTA buttons */}
+        <div ref={ctaRef} className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <a
+            href="#projects"
+            className="pill-btn pill-btn-red"
+          >
+            View Projects
+            <span className="text-xs opacity-60">›</span>
+          </a>
+          <a
+            href={profile.links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pill-btn pill-btn-white"
+          >
+            GitHub Profile
+            <span className="text-xs opacity-60">›</span>
+          </a>
+        </div>
 
+        {/* Tags */}
         <div
           ref={tagsRef}
-          className="flex flex-wrap items-center gap-2.5 pt-2 text-xs font-mono"
+          className="flex flex-wrap items-center justify-center gap-2.5 pt-4 text-xs font-mono"
         >
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface border border-stroke text-text-muted hover:text-text hover:border-zinc-700 transition-colors">
-            <Eye className="w-3.5 h-3.5 text-accent-start" />
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-obsidian-light border border-hud-dim/30 text-hud-muted hover:text-hud-white hover:border-cyber-red/40 transition-colors">
+            <Eye className="w-3.5 h-3.5 text-cyber-red" />
             Computer Vision
           </span>
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface border border-stroke text-text-muted hover:text-text hover:border-zinc-700 transition-colors">
-            <Layers className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-obsidian-light border border-hud-dim/30 text-hud-muted hover:text-hud-white hover:border-cyber-red/40 transition-colors">
+            <Layers className="w-3.5 h-3.5 text-cyber-red" />
             3D Reconstruction
           </span>
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface border border-stroke text-text-muted hover:text-text hover:border-zinc-700 transition-colors">
-            <Cpu className="w-3.5 h-3.5 text-violet-400" />
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-obsidian-light border border-hud-dim/30 text-hud-muted hover:text-hud-white hover:border-cyber-red/40 transition-colors">
+            <Cpu className="w-3.5 h-3.5 text-cyber-red" />
             Cloud GPU Pipelines
           </span>
         </div>

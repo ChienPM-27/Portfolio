@@ -92,51 +92,51 @@ export function LoadingScreen() {
       role="status"
       aria-live="polite"
       aria-label="Loading portfolio"
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-between p-8 sm:p-12 bg-[#09090b] text-foreground transition-opacity duration-700 ease-out select-none ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-between p-8 sm:p-12 bg-obsidian text-hud-white transition-opacity duration-700 ease-out select-none ${
         isExiting ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       {/* Top Telemetry Header */}
-      <div className="w-full max-w-5xl flex items-center justify-between text-[11px] font-mono text-zinc-500">
+      <div className="w-full max-w-5xl flex items-center justify-between text-[11px] font-mono text-hud-dim">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span>PORTFOLIO OS // BOOT_SEQUENCE</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyber-red animate-pulse" />
+          <span className="font-display tracking-[0.15em] uppercase">Portfolio OS // Boot_Sequence</span>
         </div>
-        <div className="hidden sm:inline-block text-zinc-600">
-          CORE // AI_ENGINEER_V1
+        <div className="hidden sm:inline-block font-display tracking-[0.15em] uppercase text-hud-dim">
+          Core // AI_Engineer_V1
         </div>
       </div>
 
       {/* Center Counter & Phrase */}
       <div className="flex flex-col items-center gap-6 my-auto">
         <div className="flex items-baseline">
-          <span className="font-mono text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter text-zinc-100 tabular-nums">
+          <span className="font-display text-7xl sm:text-9xl md:text-[10rem] font-light tracking-tight text-hud-white tabular-nums">
             {formattedCount}
           </span>
-          <span className="font-mono text-xl sm:text-2xl text-zinc-500 ml-1 font-light">
+          <span className="font-display text-2xl sm:text-3xl text-hud-dim ml-1 font-light">
             %
           </span>
         </div>
 
         {/* Dynamic Rotating Phrase */}
-        <div className="flex items-center gap-2.5 text-xs sm:text-sm font-mono tracking-wider text-zinc-300">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping shrink-0" />
-          <span className="uppercase">{activeWord}</span>
+        <div className="flex items-center gap-2.5 font-display text-xs sm:text-sm tracking-[0.25em] uppercase text-hud-muted">
+          <span className="w-2 h-2 rounded-full bg-cyber-red animate-ping shrink-0" />
+          <span>{activeWord}</span>
         </div>
 
-        {/* Signature Accent-Gradient Progress Bar */}
-        <div className="w-56 sm:w-72 h-1 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 mt-2">
+        {/* Cyber Red Progress Bar */}
+        <div className="w-56 sm:w-72 h-[2px] bg-obsidian-surface rounded-full overflow-hidden mt-2">
           <div
-            className="h-full accent-gradient rounded-full transition-all duration-75 ease-out"
+            className="h-full bg-cyber-red rounded-full transition-all duration-75 ease-out shadow-[0_0_8px_rgba(230,30,30,0.5)]"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       {/* Bottom Technical Notice */}
-      <div className="w-full max-w-5xl flex items-center justify-between text-[11px] font-mono text-zinc-600">
-        <span>INTERACTIVE 3D & COMPUTE PIPELINES</span>
-        <span>LATENCY: &lt; 45MS</span>
+      <div className="w-full max-w-5xl flex items-center justify-between text-[11px] font-display tracking-[0.15em] uppercase text-hud-dim">
+        <span>Interactive 3D & Compute Pipelines</span>
+        <span>Latency: &lt; 45MS</span>
       </div>
     </div>
   );

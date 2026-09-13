@@ -1,16 +1,15 @@
-﻿"use client";
+"use client";
 
 import React from "react";
-import { ChevronDown } from "lucide-react";
 
 export function ScrollCue() {
   return (
-    <div className="flex flex-col items-center gap-2 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer select-none">
-      <span className="text-[11px] font-mono tracking-widest uppercase">
-        Scroll to explore systems
+    <div className="flex flex-col items-center gap-3 text-hud-dim hover:text-hud-muted transition-colors cursor-pointer select-none">
+      <span className="font-display text-xs tracking-[0.3em] uppercase text-hud-muted">
+        Discover Projects
       </span>
-      <div className="w-5 h-8 rounded-full border border-zinc-700/60 flex items-start justify-center p-1">
-        <div className="w-1 h-2 rounded-full bg-cyan-400 animate-bounce" />
+      <div className="w-[1px] h-8 bg-hud-dim/40 relative overflow-hidden">
+        <div className="w-full h-3 bg-cyber-red absolute top-0 animate-bounce" />
       </div>
     </div>
   );

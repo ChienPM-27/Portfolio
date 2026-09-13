@@ -61,9 +61,9 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="border-t border-stroke/40 pt-10 pb-8 bg-surface/20 flex flex-col gap-10 overflow-hidden">
+    <footer className="border-t border-hud-dim/20 pt-10 pb-8 bg-obsidian-light/20 flex flex-col gap-10 overflow-hidden">
       {/* Infinite Horizontal Marquee Text Loop */}
-      <div className="w-full overflow-hidden border-y border-stroke/40 py-3 sm:py-3.5 bg-surface/40 select-none">
+      <div className="w-full overflow-hidden border-y border-hud-dim/15 py-3 sm:py-3.5 bg-obsidian-light/40 select-none">
         <div
           ref={marqueeRef}
           className="flex gap-8 whitespace-nowrap will-change-transform w-max"
@@ -71,10 +71,10 @@ export function Footer() {
           {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-6 font-mono text-xs sm:text-sm tracking-wider text-text-muted"
+              className="flex items-center gap-6 font-display text-xs sm:text-sm tracking-[0.2em] uppercase text-hud-muted"
             >
               <span>{item}</span>
-              <span className="accent-gradient-text font-bold">//</span>
+              <span className="text-cyber-red font-bold">//</span>
             </div>
           ))}
         </div>
@@ -85,15 +85,15 @@ export function Footer() {
         {STATS.map((stat, i) => (
           <div
             key={i}
-            className="p-4 rounded-xl bg-surface/70 border border-stroke hover:border-zinc-700/80 transition-all flex flex-col justify-between gap-2"
+            className="p-4 rounded-xl bg-obsidian-light/70 border border-hud-dim/20 hover:border-cyber-red/30 transition-all flex flex-col justify-between gap-2"
           >
-            <div className="text-xs font-mono text-text-muted">
+            <div className="text-xs font-mono text-hud-dim">
               {stat.label}
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono accent-gradient-text tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold font-display tracking-wider text-cyber-red">
               {stat.value}
             </div>
-            <div className="text-[11px] font-mono text-zinc-500">
+            <div className="text-[11px] font-mono text-hud-dim">
               {stat.subtext}
             </div>
           </div>
@@ -101,13 +101,13 @@ export function Footer() {
       </div>
 
       {/* Availability Beacon and Direct Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto px-6 w-full pt-4 border-t border-stroke/40">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto px-6 w-full pt-4 border-t border-hud-dim/20">
         <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-800/40 text-emerald-400 text-xs font-mono">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <span>Available for Junior / Intern Roles</span>
+          <span className="font-display tracking-wider uppercase text-[10px]">Available for Junior / Intern Roles</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -115,12 +115,11 @@ export function Footer() {
             href={profile.links.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface border border-stroke text-text-muted hover:text-white hover:border-zinc-600 transition-all text-xs font-mono"
+            className="pill-btn pill-btn-white !py-1.5 !px-4 text-[10px]"
             aria-label="GitHub Profile"
           >
             <Github className="w-3.5 h-3.5" />
             <span>GitHub</span>
-            <ArrowUpRight className="w-3 h-3 text-accent-start" />
           </a>
           <button
             onClick={() =>
@@ -129,17 +128,17 @@ export function Footer() {
                 profile.links.emailDomain
               )
             }
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface border border-stroke text-text-muted hover:text-white hover:border-zinc-600 transition-all text-xs font-mono"
+            className="pill-btn pill-btn-red !py-1.5 !px-4 text-[10px]"
             aria-label="Contact via email"
           >
-            <Mail className="w-3.5 h-3.5 text-accent-start" />
+            <Mail className="w-3.5 h-3.5" />
             <span>Contact</span>
           </button>
         </div>
       </div>
 
       {/* Baseline Attribution */}
-      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-zinc-500">
+      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-hud-dim">
         <span>{profile.name} — Portfolio v1.0</span>
         <span>
           {profile.education.institution} • {profile.location}

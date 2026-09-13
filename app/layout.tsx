@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Instrument_Serif, Teko } from "next/font/google";
 import { LoadingScreen } from "@/components/shell/LoadingScreen";
 import "./globals.css";
 
@@ -14,6 +14,13 @@ const instrumentSerif = Instrument_Serif({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-serif",
+  display: "swap",
+});
+
+const teko = Teko({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -43,7 +50,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#09090b",
+  themeColor: "#0b0e1a",
 };
 
 export default function RootLayout({
@@ -54,9 +61,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${inter.variable} ${instrumentSerif.variable}`}
+      className={`dark ${inter.variable} ${instrumentSerif.variable} ${teko.variable}`}
     >
-      <body className="bg-background text-foreground min-h-screen selection:bg-cyan-500/20 selection:text-cyan-400 font-sans">
+      <body className="bg-obsidian text-white min-h-screen selection:bg-cyber-red/20 selection:text-cyber-red font-sans antialiased">
         <LoadingScreen />
         {children}
       </body>
