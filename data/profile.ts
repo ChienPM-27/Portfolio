@@ -1,4 +1,4 @@
-﻿import { Profile } from "@/lib/types";
+import { Profile } from "@/lib/types";
 
 export const profile: Profile = {
   name: "Pham Minh Chien",
@@ -8,7 +8,7 @@ export const profile: Profile = {
   positioning:
     "Engineering practical AI systems spanning Computer Vision, Single-Image 3D Reconstruction, and high-throughput cloud GPU inference pipelines.",
   summary:
-    "Information Technology student at Sai Gon University with a focused interest in Artificial Intelligence, Computer Vision, backend development, and mobile application integration. Experienced in deploying deep learning inference workflows on cloud GPUs, building FastAPI services, and connecting multi-modal AI models to production interfaces.",
+    "Information Technology student at Sai Gon University with a focused interest in Artificial Intelligence, Computer Vision, backend systems, and mobile application development. Experienced in deploying deep learning inference workflows on cloud GPUs, building FastAPI services, and connecting multi-modal AI models to production interfaces.",
   education: {
     degree: "B.Eng. in Information Technology",
     institution: "Sai Gon University",
@@ -16,8 +16,8 @@ export const profile: Profile = {
     period: "Sept 2024 – Mar 2029",
     highlights: [
       "Core coursework in programming, data structures, algorithms, databases, web development, and artificial intelligence.",
-      "Building systems in computer vision, single-image 3D reconstruction, and cloud deployment pipelines.",
-      "Focusing on model inference optimization, API development, and distributed GPU environments.",
+      "Building academic projects in computer vision, single-image 3D reconstruction, and backend services.",
+      "Actively developing cloud GPU deployment workflows, model inference optimization, and distributed environments.",
     ],
   },
   skills: [
@@ -37,7 +37,14 @@ export const profile: Profile = {
     },
     {
       category: "Backend & Systems",
-      items: ["FastAPI", "Uvicorn", "REST APIs", "API Integration", "Python", "C/C++"],
+      items: [
+        "FastAPI",
+        "REST API",
+        "Uvicorn",
+        "API Integration",
+        "Python",
+        "C/C++",
+      ],
     },
     {
       category: "Mobile & Web",
@@ -52,7 +59,7 @@ export const profile: Profile = {
       ],
     },
     {
-      category: "Cloud & Infrastructure",
+      category: "Cloud & Deployment",
       items: [
         "Google Cloud VM",
         "NVIDIA L4 GPU",
@@ -65,7 +72,6 @@ export const profile: Profile = {
   ],
   links: {
     github: "https://github.com/ChienPM-27",
-    // Obfuscated email parts to protect against scraping
     emailUser: "pminhchien2006",
     emailDomain: "gmail.com",
   },

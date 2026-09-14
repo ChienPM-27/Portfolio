@@ -1,21 +1,29 @@
-﻿import { ProjectData } from "@/lib/types";
+import { ProjectData } from "@/lib/types";
 
 export const data: ProjectData = {
-  slug: "project-c",
+  slug: "project-cloud-gpu-pipeline",
   title: "Cloud GPU Inference Pipeline",
-  tagline: "Asynchronous job dispatcher & NVIDIA L4 runtime telemetry",
+  tagline: "High-Throughput Asynchronous REST Service on NVIDIA L4",
   description:
-    "Low-latency REST server orchestrating batch AI jobs, GPU memory virtualization, model checkpoint swaps, and real-time inference telemetry.",
-  role: "Backend & Systems Developer",
+    "Production-grade asynchronous inference infrastructure orchestrated with FastAPI and Uvicorn on Google Cloud VMs. Features GPU memory virtualization, dynamic batching, and CUDA debugging for low-latency multi-modal serving under 45ms.",
+  role: "AI Systems & Infrastructure Developer",
   period: "2025 – 2026",
-  techStack: ["FastAPI", "Google Cloud VM", "NVIDIA L4", "Uvicorn", "CUDA"],
+  techStack: [
+    "Google Cloud VM",
+    "NVIDIA L4 GPU",
+    "CUDA",
+    "FastAPI",
+    "Uvicorn",
+    "PyTorch",
+    "Docker",
+  ],
   metrics: [
     { label: "GPU Utilization", value: "94.2%" },
-    { label: "Queue Latency", value: "< 45ms" },
+    { label: "Pipeline Latency", value: "< 45ms" },
   ],
   links: [
     {
-      label: "System Design",
+      label: "GitHub Source",
       url: "https://github.com/ChienPM-27",
       type: "github",
     },

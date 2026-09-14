@@ -2,11 +2,10 @@
 
 import React, { useRef } from "react";
 import { profile } from "@/data/profile";
-import { triggerObfuscatedMailto } from "@/lib/contact-utils";
 import { useGSAP } from "@/lib/gsap";
 import gsap from "gsap";
 import { isReducedMotionPreferred } from "@/lib/scroll-utils";
-import { Github, Mail, ArrowUpRight } from "lucide-react";
+import { Github, ArrowUp, Mail } from "lucide-react";
 
 const MARQUEE_ITEMS = [
   "COMPUTER VISION PIPELINES",
@@ -35,8 +34,8 @@ const STATS = [
   },
   {
     label: "System Architecture",
-    value: "3 Projects",
-    subtext: "Modular 3D Scenes",
+    value: "4 Projects",
+    subtext: "Modular Interactive Scenes",
   },
 ];
 
@@ -60,10 +59,14 @@ export function Footer() {
     };
   }, []);
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <footer className="border-t border-hud-dim/20 pt-10 pb-8 bg-obsidian-light/20 flex flex-col gap-10 overflow-hidden">
+    <footer className="relative z-20 border-t border-hud-dim/20 pt-12 pb-20 bg-obsidian-light/95 backdrop-blur-md flex flex-col gap-12 overflow-hidden">
       {/* Infinite Horizontal Marquee Text Loop */}
-      <div className="w-full overflow-hidden border-y border-hud-dim/15 py-3 sm:py-3.5 bg-obsidian-light/40 select-none">
+      <div className="w-full overflow-hidden border-y border-hud-dim/15 py-3 sm:py-4 bg-obsidian/80 select-none">
         <div
           ref={marqueeRef}
           className="flex gap-8 whitespace-nowrap will-change-transform w-max"
@@ -81,68 +84,79 @@ export function Footer() {
       </div>
 
       {/* Verified Technical Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto px-6 w-full">
         {STATS.map((stat, i) => (
           <div
             key={i}
-            className="p-4 rounded-xl bg-obsidian-light/70 border border-hud-dim/20 hover:border-cyber-red/30 transition-all flex flex-col justify-between gap-2"
+            className="p-5 rounded-xl bg-obsidian/80 border border-hud-dim/20 hover:border-cyber-red/30 transition-all flex flex-col justify-between gap-2"
           >
             <div className="text-xs font-mono text-hud-dim">
               {stat.label}
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-display tracking-wider text-cyber-red">
+            <div className="text-2xl sm:text-3xl font-bold font-display tracking-wider text-cyber-red">
               {stat.value}
             </div>
-            <div className="text-[11px] font-mono text-hud-dim">
+            <div className="text-[11px] font-mono text-hud-muted">
               {stat.subtext}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Availability Beacon and Direct Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-6xl mx-auto px-6 w-full pt-4 border-t border-hud-dim/20">
-        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-800/40 text-emerald-400 text-xs font-mono">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <span className="font-display tracking-wider uppercase text-[10px]">Available for Junior / Intern Roles</span>
+      {/* Baseline Navigation & Attribution */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 max-w-6xl mx-auto px-6 w-full pt-6 border-t border-hud-dim/20">
+        {/* Identity & Origin */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 text-xs font-mono text-hud-dim text-center sm:text-left">
+          <span className="font-semibold text-hud-white">{profile.name}</span>
+          <span className="hidden sm:inline">•</span>
+          <span>{profile.education.institution}</span>
+          <span className="hidden sm:inline">•</span>
+          <span>{profile.location}</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Quick Links & Scroll to top */}
+        <div className="flex items-center gap-5 text-xs font-mono">
+          <a
+            href="#projects"
+            data-cursor="pointer"
+            className="text-hud-muted hover:text-cyber-red transition-colors"
+          >
+            Projects
+          </a>
+          <a
+            href="#about"
+            data-cursor="pointer"
+            className="text-hud-muted hover:text-cyber-red transition-colors"
+          >
+            About
+          </a>
+          <a
+            href="#contact"
+            data-cursor="pointer"
+            className="text-hud-muted hover:text-cyber-red transition-colors"
+          >
+            Contact
+          </a>
           <a
             href={profile.links.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="pill-btn pill-btn-white !py-1.5 !px-4 text-[10px]"
+            data-cursor="pointer"
+            className="text-hud-muted hover:text-hud-white transition-colors flex items-center gap-1"
             aria-label="GitHub Profile"
           >
             <Github className="w-3.5 h-3.5" />
-            <span>GitHub</span>
           </a>
           <button
-            onClick={() =>
-              triggerObfuscatedMailto(
-                profile.links.emailUser,
-                profile.links.emailDomain
-              )
-            }
-            className="pill-btn pill-btn-red !py-1.5 !px-4 text-[10px]"
-            aria-label="Contact via email"
+            onClick={scrollToTop}
+            data-cursor="pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-obsidian border border-hud-dim/30 text-hud-muted hover:text-cyber-red hover:border-cyber-red/50 transition-all text-xs"
+            aria-label="Scroll to top"
           >
-            <Mail className="w-3.5 h-3.5" />
-            <span>Contact</span>
+            <ArrowUp className="w-3.5 h-3.5" />
+            <span>Top</span>
           </button>
         </div>
-      </div>
-
-      {/* Baseline Attribution */}
-      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-hud-dim">
-        <span>{profile.name} — Portfolio v1.0</span>
-        <span>
-          {profile.education.institution} • {profile.location}
-        </span>
       </div>
     </footer>
   );

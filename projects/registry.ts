@@ -10,15 +10,14 @@ import ProjBScene from "./project-b/Scene";
 import { data as projCData } from "./project-c/data";
 import ProjCScene from "./project-c/Scene";
 
+import { data as projDData } from "./project-d/data";
+import ProjDScene from "./project-d/Scene";
+
 /**
  * Central Project Registry
  *
- * Principle I: This file is the ONLY place that lists which projects exist and in what order.
- * Adding a new project requires:
- * 1. Creating projects/<slug>/{data.ts, Scene.tsx}
- * 2. Registering it here.
- *
- * Zero edits to global layouts or other project modules.
+ * Source of truth for portfolio project scenes.
+ * Adding a project requires creating its data.ts + Scene.tsx and registering here.
  */
 export const projects: ProjectDefinition[] = [
   {
@@ -32,5 +31,9 @@ export const projects: ProjectDefinition[] = [
   {
     data: projCData,
     Scene: ProjCScene,
+  },
+  {
+    data: projDData,
+    Scene: ProjDScene,
   },
 ];

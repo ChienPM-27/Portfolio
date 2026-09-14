@@ -36,12 +36,14 @@ export function Navigation() {
         <nav className="flex items-center gap-4 sm:gap-6">
           <a
             href="#projects"
+            data-cursor="pointer"
             className="font-display text-xs tracking-[0.2em] uppercase text-hud-muted hover:text-cyber-red transition-colors hidden sm:inline-block"
           >
             Projects
           </a>
           <a
             href="#about"
+            data-cursor="pointer"
             className="font-display text-xs tracking-[0.2em] uppercase text-hud-muted hover:text-cyber-red transition-colors hidden sm:inline-block"
           >
             About
@@ -51,6 +53,7 @@ export function Navigation() {
               href={profile.links.github}
               target="_blank"
               rel="noopener noreferrer"
+              data-cursor="pointer"
               className="pill-btn pill-btn-red !py-2 !px-5 text-[10px]"
               aria-label="GitHub Profile"
             >
