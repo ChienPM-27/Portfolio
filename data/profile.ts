@@ -6,9 +6,9 @@ export const profile: Profile = {
   status: "IT Student @ Sai Gon University • Seeking AI Engineer Internship",
   location: "Ho Chi Minh City, Viet Nam",
   positioning:
-    "Information Technology student passionate about AI Engineering — building practical machine learning models, PyTorch pipelines, and backend APIs.",
+    "Information Technology student at Sai Gon University exploring AI Engineering — building practical machine learning pipelines, PyTorch models, and backend APIs.",
   summary:
-    "Information Technology student at Sai Gon University (Class of 2024–2029) focusing on AI Engineering. Passionate about machine learning, deep learning, PyTorch workflows, and backend API integration with FastAPI. Actively seeking an AI Engineer Internship opportunity to learn, apply foundational knowledge, and contribute to real-world AI projects.",
+    "I'm an Information Technology student at Sai Gon University, exploring AI Engineering through hands-on projects and continuous experimentation. My technical interests include machine learning, computer vision, and building practical systems that connect AI models with real-world applications.\n\nI enjoy learning by building — experimenting with models, working with backend services, and turning ideas into functional projects. Currently seeking an AI Engineering Internship to grow as an engineer, learn from real-world challenges, and contribute to meaningful projects.",
   education: {
     degree: "B.Eng. in Information Technology",
     institution: "Sai Gon University",
@@ -16,8 +16,8 @@ export const profile: Profile = {
     period: "Sept 2024 – Mar 2029",
     highlights: [
       "Core coursework in data structures, algorithms, mathematics, and artificial intelligence fundamentals.",
-      "Building hands-on academic and personal projects in machine learning, PyTorch, computer vision, and backend services.",
-      "Exploring model deployment workflows, FastAPI microservices, and cloud compute environments.",
+      "Practical project work in machine learning pipelines, model inference, and backend API integration.",
+      "Deploying deep learning workflows on cloud GPUs and connecting AI services to responsive applications.",
     ],
   },
   skills: [
@@ -57,10 +57,11 @@ export const profile: Profile = {
       ],
     },
     {
-      category: "Tools & Environments",
+      category: "Cloud & Environments",
       items: [
-        "Linux / Bash",
         "Google Cloud VM",
+        "NVIDIA L4 GPU",
+        "Linux / Bash",
         "CUDA Basics",
         "Jupyter Notebook",
         "Postman",
