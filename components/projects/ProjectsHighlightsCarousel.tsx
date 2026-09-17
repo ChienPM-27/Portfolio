@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { projects } from "@/projects/registry";
 import { useProjectDetail } from "@/lib/project-detail-context";
 import { ProjectPoster } from "./ProjectPoster";
@@ -8,10 +8,13 @@ import { useGSAP } from "@/lib/gsap";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export function ProjectsHighlightsCarousel() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const title1Ref = useRef<HTMLHeadingElement>(null);
-  const title2Ref = useRef<HTMLHeadingElement>(null);
+  const pinStageRef = useRef<HTMLDivElement>(null);
+  const titleWrapperRef = useRef<HTMLDivElement>(null);
+  const cardsWrapperRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -19,54 +22,62 @@ export function ProjectsHighlightsCarousel() {
   const [activeIndex, setActiveIndex] = useState(1);
   const { openProject } = useProjectDetail();
 
-  // Split-Text Scroll Scrub Animation (Logotomia charsDown fade scrub mechanism)
+  // ScrollTrigger Pin & Scrub Transition:
+  // When title hits center -> Pins section -> Scrub down fades title left & slides cards in -> Scrub up reverses
   useGSAP(
     () => {
-      const titles = [title1Ref.current, title2Ref.current];
+      const container = containerRef.current;
+      const titleWrapper = titleWrapperRef.current;
+      const cardsWrapper = cardsWrapperRef.current;
+      if (!container || !titleWrapper || !cardsWrapper) return;
 
-      titles.forEach((heading) => {
-        if (!heading) return;
-
-        const originalText = heading.innerText.trim();
-        heading.innerHTML = "";
-
-        // Wrap each character into a span
-        originalText.split("").forEach((char) => {
-          const span = document.createElement("span");
-          span.className = "inline-block will-change-transform";
-          span.innerHTML = char === " " ? "&nbsp;" : char;
-          heading.appendChild(span);
-        });
-
-        const chars = heading.querySelectorAll("span");
-
-        gsap.fromTo(
-          chars,
-          {
-            y: "110%",
-            opacity: 0,
-            rotateX: -30,
-          },
-          {
-            y: "0%",
-            opacity: 1,
-            rotateX: 0,
-            stagger: 0.03,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: heading,
-              start: "top 85%",
-              end: "top 55%",
-              scrub: 1, // Directly bound to scroll momentum
-            },
-          }
-        );
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: container,
+          start: "top center", // Triggers when section top hits the exact center of screen
+          end: "+=1300",       // Pinned scroll travel distance
+          pin: true,           // Pin the container in place
+          scrub: 1,            // Smooth bidirectional scrub
+          anticipatePin: 1,
+        },
       });
+
+      // 1. Title transitions and fades to the left
+      tl.fromTo(
+        titleWrapper,
+        { x: 0, opacity: 1, filter: "blur(0px)" },
+        {
+          x: -360,
+          opacity: 0,
+          filter: "blur(10px)",
+          ease: "power2.inOut",
+          duration: 0.9,
+        },
+        0
+      );
+
+      // 2. Concurrently, cards slide in from right to center stage
+      tl.fromTo(
+        cardsWrapper,
+        {
+          x: "100%",
+          opacity: 0,
+          pointerEvents: "none",
+        },
+        {
+          x: "0%",
+          opacity: 1,
+          pointerEvents: "auto",
+          ease: "power2.out",
+          duration: 1.1,
+        },
+        0.15
+      );
     },
     { scope: containerRef }
   );
 
-  // Momentum Drag & Wheel Carousel Physics
+  // Momentum Drag & Scroll Physics for the cards carousel
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -82,24 +93,29 @@ export function ProjectsHighlightsCarousel() {
       const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
 
       if (thumbRef.current) {
-        thumbRef.current.style.transform = `translateX(${progress * (200 - 40)}px)`;
+        thumbRef.current.style.transform = `translateX(${progress * (200 - 48)}px)`;
       }
 
-      // Calculate current slide index
-      const slideWidth = 460 + 32; // card width + gap
+      const slideWidth = 520 + 32;
       const current = Math.min(
-        projects.length,
-        Math.max(1, Math.round(viewport.scrollLeft / slideWidth) + 1)
+        Math.max(Math.round(viewport.scrollLeft / slideWidth) + 1, 1),
+        projects.length
       );
       setActiveIndex(current);
     };
 
     const onMouseDown = (e: MouseEvent) => {
       isDown = true;
-      cancelAnimationFrame(momentumId);
       startX = e.pageX - viewport.offsetLeft;
       scrollLeft = viewport.scrollLeft;
       velX = 0;
+      cancelAnimationFrame(momentumId);
+    };
+
+    const onMouseLeave = () => {
+      if (!isDown) return;
+      isDown = false;
+      applyMomentum();
     };
 
     const onMouseUp = () => {
@@ -120,27 +136,16 @@ export function ProjectsHighlightsCarousel() {
     };
 
     const applyMomentum = () => {
-      if (Math.abs(velX) > 0.5) {
-        viewport.scrollLeft += velX;
-        velX *= 0.93; // Inertial damping
-        updateProgress();
-        momentumId = requestAnimationFrame(applyMomentum);
-      }
+      if (Math.abs(velX) < 0.5) return;
+      viewport.scrollLeft += velX;
+      velX *= 0.92; // Inertia damping
+      updateProgress();
+      momentumId = requestAnimationFrame(applyMomentum);
     };
 
-    // Horizontal wheel conversion when mouse hovers carousel
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        const maxScroll = viewport.scrollWidth - viewport.clientWidth;
-        const atStart = viewport.scrollLeft <= 0 && e.deltaY < 0;
-        const atEnd = viewport.scrollLeft >= maxScroll && e.deltaY > 0;
-
-        if (!atStart && !atEnd) {
-          e.preventDefault();
-          viewport.scrollLeft += e.deltaY * 1.2;
-          updateProgress();
-        }
-      } else {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        viewport.scrollLeft += e.deltaX;
         updateProgress();
       }
     };
@@ -148,7 +153,7 @@ export function ProjectsHighlightsCarousel() {
     viewport.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mouseup", onMouseUp);
     window.addEventListener("mousemove", onMouseMove);
-    viewport.addEventListener("wheel", onWheel, { passive: false });
+    viewport.addEventListener("wheel", onWheel, { passive: true });
     viewport.addEventListener("scroll", updateProgress, { passive: true });
 
     return () => {
@@ -165,127 +170,114 @@ export function ProjectsHighlightsCarousel() {
     <section
       ref={containerRef}
       id="projects-highlights"
-      className="relative py-24 sm:py-32 bg-obsidian-light/60 border-t border-hud-dim/20 overflow-hidden"
+      className="relative w-full bg-obsidian border-t border-hud-dim/20"
     >
-      {/* Section Header with Split Text */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 mb-12">
-        <div className="flex items-center justify-between mb-4">
-          <span className="font-mono text-xs tracking-[0.2em] text-hud-muted uppercase">
+      {/* Pinned Stage Viewport (Locks in screen during the scrub sequence) */}
+      <div
+        ref={pinStageRef}
+        className="relative w-full h-screen overflow-hidden flex items-center justify-center"
+      >
+        {/* Subtle Ambient Radial Backlight */}
+        <div
+          className="absolute inset-0 bg-radial from-obsidian-surface/30 via-obsidian to-obsidian pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* LAYER 1: Title in Center (Initial View -> Transitions & Fades Left on Scroll) */}
+        <div
+          ref={titleWrapperRef}
+          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none z-20 select-none will-change-transform"
+        >
+          <span className="font-mono text-xs sm:text-sm tracking-[0.3em] text-cyber-red uppercase mb-4 font-semibold">
             // 02 HIGHLIGHTS
           </span>
-
-          {/* Drag Action Indicator with Animating Arrow */}
-          <div className="flex items-center gap-3 font-mono text-xs tracking-widest text-hud-white uppercase select-none">
-            <span className="font-semibold text-cyber-red">DRAG</span>
-            <svg
-              className="w-12 h-4 text-hud-white animate-[bounceRight_1.8s_infinite_ease-in-out]"
-              viewBox="0 0 64 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 10H58M58 10L48 2M58 10L48 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
+          <h2 className="font-display text-6xl sm:text-8xl md:text-9xl font-bold uppercase tracking-tight text-hud-white leading-[0.88]">
+            Professional
+          </h2>
+          <h2 className="font-display text-6xl sm:text-8xl md:text-9xl font-bold uppercase tracking-tight text-hud-muted/50 leading-[0.88] mt-2">
+            Projects
+          </h2>
+          <div className="mt-8 flex items-center gap-3 font-mono text-xs tracking-widest text-hud-muted uppercase">
+            <span className="w-8 h-[1px] bg-hud-dim/40" />
+            <span>SCROLL DOWN TO REVEAL</span>
+            <span className="text-cyber-red">&darr;</span>
+            <span className="w-8 h-[1px] bg-hud-dim/40" />
           </div>
         </div>
 
-        <div className="flex flex-col select-none">
-          <h2
-            ref={title1Ref}
-            className="font-display text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight text-hud-white leading-[0.92] overflow-hidden"
-          >
-            Professional projects
-          </h2>
-          <h2
-            ref={title2Ref}
-            className="font-display text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight text-hud-muted/50 leading-[0.92] overflow-hidden mt-1"
-          >
-            Highlights
-          </h2>
-        </div>
-      </div>
+        {/* LAYER 2: Cards Layer (Slides in from Right as Title Fades Left) */}
+        <div
+          ref={cardsWrapperRef}
+          className="relative z-10 w-full h-full flex flex-col justify-between py-8 sm:py-12 px-4 sm:px-10 will-change-transform"
+        >
+          {/* Top Telemetry Header inside Pinned Stage */}
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-4 z-30 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
+              <span className="font-mono text-xs tracking-widest text-hud-white uppercase font-semibold">
+                PROFESSIONAL PROJECTS // HIGHLIGHTS
+              </span>
+            </div>
 
-      {/* Horizontal Carousel Viewport */}
-      <div
-        ref={viewportRef}
-        data-cursor="drag"
-        className="relative w-full px-6 sm:px-10 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <div ref={trackRef} className="flex gap-8 w-max py-4">
-          {projects.map((proj, idx) => {
-            const { data, Scene } = proj;
-
-            return (
-              <article
-                key={data.slug}
-                onClick={() => openProject(data.slug)}
-                className="group relative w-[340px] sm:w-[440px] md:w-[480px] flex-shrink-0 flex flex-col justify-between p-6 rounded-2xl border border-hud-dim/30 bg-obsidian-surface/60 hover:border-hud-white/50 backdrop-blur-md transition-all duration-400 cursor-pointer shadow-2xl"
+            {/* Drag Action Indicator */}
+            <div className="flex items-center gap-3 font-mono text-xs tracking-widest text-hud-white uppercase select-none">
+              <span className="font-semibold text-cyber-red">DRAG TO INSPECT</span>
+              <svg
+                className="w-10 h-4 text-hud-white animate-[bounceRight_1.8s_infinite_ease-in-out]"
+                viewBox="0 0 64 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Card Meta Row */}
-                <div className="flex items-baseline justify-between border-b border-hud-dim/20 pb-3 mb-4">
-                  <h3 className="font-display text-2xl font-bold uppercase text-hud-white tracking-wide group-hover:text-cyber-red transition-colors">
-                    {data.title}
-                  </h3>
+                <path
+                  d="M0 10H58M58 10L48 2M58 10L48 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
 
-                  <div className="flex items-center gap-1.5 font-mono text-[10px] text-hud-muted tracking-wider">
-                    <span className="text-hud-dim">/</span>
-                    <span>{data.techStack[0]}</span>
-                    {data.techStack[1] && (
-                      <>
-                        <span className="text-hud-dim">•</span>
-                        <span>{data.techStack[1]}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Static Technical Poster Preview Box (Zero WebGL overhead, instantaneous load) */}
-                <div className="relative w-full h-[240px] sm:h-[280px] rounded-xl overflow-hidden bg-obsidian border border-hud-dim/30 group-hover:border-hud-white/30 transition-all duration-300">
-                  <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-500 ease-out">
-                    <ProjectPoster project={data} index={idx} />
-                  </div>
-
-                  {/* Gradient Vignette & Click Cue */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 via-transparent to-transparent pointer-events-none flex items-end p-4">
-                    <span className="font-mono text-[9px] tracking-widest text-hud-muted group-hover:text-hud-white uppercase transition-colors">
-                      [ CLICK TO EXPAND DETAILS ]
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Bottom Tagline */}
-                <div className="mt-4 pt-3 border-t border-hud-dim/20 flex items-center justify-between">
-                  <p className="text-xs text-hud-muted font-normal line-clamp-1">
-                    {data.tagline}
-                  </p>
-                  <span className="font-mono text-[10px] text-hud-dim ml-2 flex-shrink-0">
-                    0{idx + 1}
-                  </span>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Progress Bar & Slide Counter */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 mt-8 flex items-center justify-between">
-        {/* Track Line */}
-        <div className="relative w-48 sm:w-60 h-[2px] bg-hud-dim/30 rounded-full overflow-hidden">
+          {/* Horizontal Carousel Viewport */}
           <div
-            ref={thumbRef}
-            className="absolute top-0 left-0 w-10 h-full bg-hud-white rounded-full transition-transform duration-75 ease-linear"
-          />
-        </div>
+            ref={viewportRef}
+            data-cursor="drag"
+            className="relative w-full my-auto overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none py-4"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <div ref={trackRef} className="flex items-center gap-8 sm:gap-12 w-max px-6 sm:px-12 py-2">
+              {projects.map((proj, idx) => (
+                <article
+                  key={proj.data.slug}
+                  onClick={() => openProject(proj.data.slug)}
+                  className="group relative w-[320px] sm:w-[460px] md:w-[540px] lg:w-[600px] h-[480px] sm:h-[540px] md:h-[580px] flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.015]"
+                >
+                  <ProjectPoster project={proj.data} index={idx} />
+                </article>
+              ))}
+            </div>
 
-        {/* Counter */}
-        <div className="font-mono text-xs tracking-widest text-hud-muted">
-          <span className="text-hud-white font-bold">0{activeIndex}</span> / 0{projects.length}
+            {/* Logotomia Signature Floating "Drag" Circle Badge */}
+            <div className="absolute right-12 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white text-[#0b0e1a] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center shadow-2xl pointer-events-none z-30 border border-black/10">
+              Drag
+            </div>
+          </div>
+
+          {/* Bottom Progress Bar & Slide Counter */}
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-4 flex-shrink-0">
+            {/* Track Line */}
+            <div className="relative w-48 sm:w-64 h-[2px] bg-hud-dim/30 rounded-full overflow-hidden">
+              <div
+                ref={thumbRef}
+                className="absolute top-0 left-0 w-12 h-full bg-cyber-red rounded-full transition-transform duration-75 ease-linear"
+              />
+            </div>
+
+            {/* Slide Counter */}
+            <div className="font-mono text-xs tracking-widest text-hud-muted">
+              <span className="text-hud-white font-bold">0{activeIndex}</span> / 0{projects.length}
+            </div>
+          </div>
         </div>
       </div>
     </section>
