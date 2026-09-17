@@ -7,9 +7,6 @@ import { useGSAP } from "@/lib/gsap";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register once at module level so scrub animations are always available
-gsap.registerPlugin(ScrollTrigger);
-
 export function ProjectsHighlightsCarousel() {
   const containerRef = useRef<HTMLDivElement>(null);
   const title1Ref = useRef<HTMLHeadingElement>(null);
@@ -167,18 +164,8 @@ export function ProjectsHighlightsCarousel() {
     <section
       ref={containerRef}
       id="projects-highlights"
-      className="relative z-20 py-24 sm:py-32 bg-obsidian border-t border-hud-dim/20 overflow-hidden"
+      className="relative py-24 sm:py-32 bg-obsidian-light/60 border-t border-hud-dim/20 overflow-hidden"
     >
-      {/* Gradient at the top — fades the hero→highlights boundary smoothly */}
-      <div
-        className="pointer-events-none absolute top-0 left-0 right-0 h-28"
-        aria-hidden="true"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(11,14,26,0.85) 0%, transparent 100%)",
-        }}
-      />
-
       {/* Section Header with Split Text */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 mb-12">
         <div className="flex items-center justify-between mb-4">

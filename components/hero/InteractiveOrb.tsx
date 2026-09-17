@@ -1,100 +1,61 @@
 ﻿"use client";
 
-import React, { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
-
-// ---------------------------------------------------------------------------
-// Particle Nebula — runs entirely on the existing bundled Three.js/R3F.
-// No Spline CDN, no React state toggle = smooth 60fps with zero jank.
-// ---------------------------------------------------------------------------
-
-function ParticleNebula() {
-  const pointsRef = useRef<THREE.Points>(null);
-
-  // Build geometry once in a memo — no allocations per frame
-  const { geometry, material } = useMemo(() => {
-    const COUNT = 6000;
-    const positions = new Float32Array(COUNT * 3);
-    const colors = new Float32Array(COUNT * 3);
-
-    for (let i = 0; i < COUNT; i++) {
-      // Oblate spheroid (galaxy-like) distribution
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * Math.PI * 2;
-      const phi = Math.acos(2 * v - 1);
-      const r = Math.pow(Math.random(), 0.55) * 2.1; // bias toward center
-      const flatY = 0.32 + Math.random() * 0.18; // flatten on Y axis
-
-      positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * flatY;
-      positions[i * 3 + 2] = r * Math.cos(phi);
-
-      // Brightness fades from white center to dim-gray edge
-      const brightness = Math.max(0.28, 1 - (r / 2.1) * 0.72);
-      const blueShift = 0.06 * Math.max(0, 1 - r / 2.1);
-      colors[i * 3]     = brightness * 0.93;
-      colors[i * 3 + 1] = brightness * 0.93;
-      colors[i * 3 + 2] = Math.min(1, brightness + blueShift);
-    }
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-
-    const mat = new THREE.PointsMaterial({
-      size: 0.019,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.78,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    return { geometry: geo, material: mat };
-  }, []);
-
-  useFrame((state, delta) => {
-    if (!pointsRef.current) return;
-    pointsRef.current.rotation.y += delta * 0.042;
-    pointsRef.current.rotation.x =
-      Math.sin(state.clock.elapsedTime * 0.11) * 0.07;
-  });
-
-  return <points ref={pointsRef} geometry={geometry} material={material} />;
-}
-
-// ---------------------------------------------------------------------------
-// Public export — drop-in replacement for the old Spline InteractiveOrb
-// ---------------------------------------------------------------------------
+import React, { useEffect, useState, useRef } from "react";
+import Script from "next/script";
 
 export function InteractiveOrb() {
+  const [isSplineLoaded, setIsSplineLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check if custom elements already registered spline-viewer
+    if (typeof window !== "undefined" && customElements.get("spline-viewer")) {
+      setIsSplineLoaded(true);
+    }
+  }, []);
+
   return (
-    <div className="w-full h-full cursor-grab active:cursor-grabbing select-none">
-      <Canvas
-        camera={{ position: [0, 0.4, 3.6], fov: 50 }}
-        gl={{
-          antialias: false,
-          alpha: true,
-          powerPreference: "high-performance",
-        }}
-        dpr={[1, 1.5]}
-        style={{ background: "transparent" }}
-        frameloop="always"
-      >
-        <ParticleNebula />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          rotateSpeed={0.32}
-          dampingFactor={0.07}
-          enableDamping
-          autoRotate={false}
-        />
-      </Canvas>
+    <div
+      ref={containerRef}
+      className="relative w-full h-full flex items-center justify-center select-none"
+    >
+      {/* Script for Spline Viewer Component */}
+      <Script
+        src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"
+        type="module"
+        strategy="lazyOnload"
+        onLoad={() => setIsSplineLoaded(true)}
+      />
+
+      {/* Outer Ambient Radial Glow */}
+      <div 
+        className="absolute -inset-10 rounded-full bg-radial from-cyber-red/10 via-transparent to-transparent blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* Circular Mask Frame (Logotomia mechanism) */}
+      <div className="relative w-full h-full rounded-full overflow-hidden border border-hud-white/10 bg-obsidian/80 shadow-[0_20px_80px_rgba(0,0,0,0.8),inset_0_0_50px_rgba(255,255,255,0.03)] backdrop-blur-xs flex items-center justify-center">
+        {/* Spline Viewer */}
+        {isSplineLoaded ? (
+          React.createElement("spline-viewer", {
+            url: "https://prod.spline.design/NRtXGhILSCPoaWWq/scene.splinecode",
+            "loading-anim-type": "spinner-small-dark",
+            style: { width: "100%", height: "100%", display: "block" },
+          })
+        ) : (
+          /* Procedural Geometric 3D Fallback Wireframe */
+          <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-obsidian-light/40 animate-pulse">
+            <div className="w-48 h-48 rounded-full border border-hud-dim/30 border-dashed animate-[spin_16s_linear_infinite] flex items-center justify-center">
+              <div className="w-32 h-32 rounded-full border border-cyber-red/30 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full border border-hud-white/20" />
+              </div>
+            </div>
+            <span className="mt-4 font-mono text-[10px] tracking-widest text-hud-muted uppercase">
+              INITIALIZING 3D RECONSTRUCTION CORE...
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
