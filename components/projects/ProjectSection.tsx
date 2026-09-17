@@ -50,6 +50,7 @@ export function ProjectSection({
         start: SCENE_TRACK_START,
         end: SCENE_TRACK_END,
         scrub: 0.5,
+        refreshPriority: 1,
         onUpdate: (self) => {
           setSceneState({
             progress: self.progress,
@@ -68,6 +69,7 @@ export function ProjectSection({
           start: REVEAL_START,
           end: REVEAL_END,
           scrub: 0.6,
+          refreshPriority: 1,
         },
       });
 

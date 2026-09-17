@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useEffect, useState } from "react";
 import { projects } from "@/projects/registry";
@@ -22,147 +22,214 @@ export function ProjectsHighlightsCarousel() {
   const [activeIndex, setActiveIndex] = useState(1);
   const { openProject } = useProjectDetail();
 
+  const hasMovedRef = useRef(false);
+
   // ScrollTrigger Pin & Scrub Transition:
-  // When title hits center -> Pins section -> Scrub down fades title left & slides cards in -> Scrub up reverses
+  // When section hits top of viewport (title is centered in 100vh) -> Pins section ->
+  // Phase 1: Scrub down fades title left & reveals cards from left to right ->
+  // Phase 2: Continues scrub to glide horizontally across cards ->
+  // Phase 3: Smooth unpin into #projects without any DOM overlap.
   useGSAP(
     () => {
       const container = containerRef.current;
       const titleWrapper = titleWrapperRef.current;
       const cardsWrapper = cardsWrapperRef.current;
-      if (!container || !titleWrapper || !cardsWrapper) return;
+      const track = trackRef.current;
+      const viewport = viewportRef.current;
+      const thumb = thumbRef.current;
+      if (!container || !titleWrapper || !cardsWrapper || !track || !viewport) return;
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
-          start: "top center", // Triggers when section top hits the exact center of screen
-          end: "+=1300",       // Pinned scroll travel distance
-          pin: true,           // Pin the container in place
-          scrub: 1,            // Smooth bidirectional scrub
+          start: "top top",
+          end: "+=2400",
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
           anticipatePin: 1,
+          refreshPriority: 10,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (p < 0.28) {
+              setActiveIndex(1);
+            } else {
+              const cardP = Math.min(Math.max((p - 0.28) / 0.58, 0), 1);
+              const idx = Math.min(
+                Math.max(Math.floor(cardP * projects.length) + 1, 1),
+                projects.length
+              );
+              setActiveIndex(idx);
+            }
+          },
         },
       });
 
-      // 1. Title transitions and fades to the left
-      tl.fromTo(
+      // PHASE 1 (0 to 0.28): Title fades & sweeps left FIRST, then Cards stagger in from left to right
+      tl.to(
         titleWrapper,
-        { x: 0, opacity: 1, filter: "blur(0px)" },
         {
-          x: -360,
-          opacity: 0,
-          filter: "blur(10px)",
-          ease: "power2.inOut",
-          duration: 0.9,
+          x: () => -Math.max(window.innerWidth * 0.6, 750),
+          autoAlpha: 0,
+          filter: "blur(14px)",
+          ease: "power2.in",
+          duration: 0.12,
         },
         0
       );
 
-      // 2. Concurrently, cards slide in from right to center stage
       tl.fromTo(
         cardsWrapper,
+        { autoAlpha: 0 },
         {
-          x: "100%",
-          opacity: 0,
-          pointerEvents: "none",
+          autoAlpha: 1,
+          ease: "power1.out",
+          duration: 0.1,
         },
-        {
-          x: "0%",
-          opacity: 1,
-          pointerEvents: "auto",
-          ease: "power2.out",
-          duration: 1.1,
-        },
-        0.15
+        0.08
       );
+
+      // Top and bottom telemetry fade in
+      tl.fromTo(
+        ".telemetry-hud",
+        { opacity: 0, y: -8 },
+        { opacity: 1, y: 0, ease: "power2.out", duration: 0.12 },
+        0.1
+      );
+
+      // Individual cards stagger in from left to right: 01 -> 02 -> 03 -> 04
+      tl.fromTo(
+        ".highlight-card",
+        {
+          x: -70,
+          opacity: 0,
+          scale: 0.95,
+        },
+        {
+          x: 0,
+          opacity: 1,
+          scale: 1,
+          stagger: 0.04,
+          ease: "power2.out",
+          duration: 0.16,
+        },
+        0.1
+      );
+
+      // PHASE 2 (0.28 to 0.86): Scrub horizontal track across the 4 cards
+      tl.to(
+        track,
+        {
+          x: () => {
+            const maxScroll = track.scrollWidth - (viewport?.clientWidth || 0);
+            return maxScroll > 0 ? -maxScroll - 48 : 0;
+          },
+          ease: "none",
+          duration: 0.58,
+        },
+        0.28
+      );
+
+      // Progress bar indicator tracks the horizontal travel
+      if (thumb) {
+        tl.to(
+          thumb,
+          {
+            x: 200 - 48,
+            ease: "none",
+            duration: 0.58,
+          },
+          0.28
+        );
+      }
+
+      // PHASE 3 (0.86 to 1.0): Cards layer cleanly fades out before unpinning so subsequent section enters pure
+      tl.to(
+        cardsWrapper,
+        {
+          autoAlpha: 0,
+          y: -40,
+          ease: "power2.in",
+          duration: 0.1,
+        },
+        0.88
+      );
+
+      tl.to({}, { duration: 0.02 }, 0.98);
     },
     { scope: containerRef }
   );
 
-  // Momentum Drag & Scroll Physics for the cards carousel
+  // Unified Mouse Drag & Touch Swipe:
+  // Converts horizontal drag into window scroll, seamlessly driving the exact same GSAP scrub!
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
     let isDown = false;
     let startX = 0;
-    let scrollLeft = 0;
-    let velX = 0;
-    let momentumId: number;
-
-    const updateProgress = () => {
-      const maxScroll = viewport.scrollWidth - viewport.clientWidth;
-      const progress = maxScroll > 0 ? viewport.scrollLeft / maxScroll : 0;
-
-      if (thumbRef.current) {
-        thumbRef.current.style.transform = `translateX(${progress * (200 - 48)}px)`;
-      }
-
-      const slideWidth = 520 + 32;
-      const current = Math.min(
-        Math.max(Math.round(viewport.scrollLeft / slideWidth) + 1, 1),
-        projects.length
-      );
-      setActiveIndex(current);
-    };
+    let startScrollY = 0;
 
     const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return;
       isDown = true;
-      startX = e.pageX - viewport.offsetLeft;
-      scrollLeft = viewport.scrollLeft;
-      velX = 0;
-      cancelAnimationFrame(momentumId);
-    };
-
-    const onMouseLeave = () => {
-      if (!isDown) return;
-      isDown = false;
-      applyMomentum();
-    };
-
-    const onMouseUp = () => {
-      if (!isDown) return;
-      isDown = false;
-      applyMomentum();
+      hasMovedRef.current = false;
+      startX = e.pageX;
+      startScrollY = window.scrollY;
     };
 
     const onMouseMove = (e: MouseEvent) => {
       if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - viewport.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      const prevScroll = viewport.scrollLeft;
-      viewport.scrollLeft = scrollLeft - walk;
-      velX = viewport.scrollLeft - prevScroll;
-      updateProgress();
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 6) {
+        hasMovedRef.current = true;
+      }
+      const scrollFactor = 2.0;
+      window.scrollTo({
+        top: startScrollY - dx * scrollFactor,
+        behavior: "instant" as ScrollBehavior,
+      });
     };
 
-    const applyMomentum = () => {
-      if (Math.abs(velX) < 0.5) return;
-      viewport.scrollLeft += velX;
-      velX *= 0.92; // Inertia damping
-      updateProgress();
-      momentumId = requestAnimationFrame(applyMomentum);
+    const onMouseUp = () => {
+      isDown = false;
     };
 
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        viewport.scrollLeft += e.deltaX;
-        updateProgress();
+    let touchStartX = 0;
+    let touchStartScrollY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].pageX;
+      touchStartScrollY = window.scrollY;
+      hasMovedRef.current = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const dx = e.touches[0].pageX - touchStartX;
+      if (Math.abs(dx) > 8) {
+        hasMovedRef.current = true;
+        window.scrollTo({
+          top: touchStartScrollY - dx * 2.0,
+          behavior: "instant" as ScrollBehavior,
+        });
       }
     };
 
     viewport.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mouseup", onMouseUp);
     window.addEventListener("mousemove", onMouseMove);
-    viewport.addEventListener("wheel", onWheel, { passive: true });
-    viewport.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("mouseup", onMouseUp);
+    viewport.addEventListener("touchstart", onTouchStart, { passive: true });
+    viewport.addEventListener("touchmove", onTouchMove, { passive: true });
 
     return () => {
       viewport.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("mousemove", onMouseMove);
-      viewport.removeEventListener("wheel", onWheel);
-      viewport.removeEventListener("scroll", updateProgress);
-      cancelAnimationFrame(momentumId);
+      window.removeEventListener("mouseup", onMouseUp);
+      viewport.removeEventListener("touchstart", onTouchStart);
+      viewport.removeEventListener("touchmove", onTouchMove);
     };
   }, []);
 
@@ -170,9 +237,9 @@ export function ProjectsHighlightsCarousel() {
     <section
       ref={containerRef}
       id="projects-highlights"
-      className="relative w-full bg-obsidian border-t border-hud-dim/20"
+      className="relative w-full bg-obsidian border-t border-hud-dim/20 z-20"
     >
-      {/* Pinned Stage Viewport (Locks in screen during the scrub sequence) */}
+      {/* Pinned Stage Viewport (Locks cleanly in screen during the scrub sequence) */}
       <div
         ref={pinStageRef}
         className="relative w-full h-screen overflow-hidden flex items-center justify-center"
@@ -183,10 +250,10 @@ export function ProjectsHighlightsCarousel() {
           aria-hidden="true"
         />
 
-        {/* LAYER 1: Title in Center (Initial View -> Transitions & Fades Left on Scroll) */}
+        {/* LAYER 1: Title in Center (Initial View -> Transitions & Fades Left on Scroll, z-10) */}
         <div
           ref={titleWrapperRef}
-          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none z-20 select-none will-change-transform"
+          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none z-10 select-none will-change-transform"
         >
           <span className="font-mono text-xs sm:text-sm tracking-[0.3em] text-cyber-red uppercase mb-4 font-semibold">
             // 02 HIGHLIGHTS
@@ -205,13 +272,13 @@ export function ProjectsHighlightsCarousel() {
           </div>
         </div>
 
-        {/* LAYER 2: Cards Layer (Slides in from Right as Title Fades Left) */}
+        {/* LAYER 2: Cards Layer (Slides in from Right as Title Fades Left, z-20) */}
         <div
           ref={cardsWrapperRef}
-          className="relative z-10 w-full h-full flex flex-col justify-between py-8 sm:py-12 px-4 sm:px-10 will-change-transform"
+          className="relative z-20 w-full h-full flex flex-col justify-between py-8 sm:py-12 px-4 sm:px-10 will-change-transform"
         >
           {/* Top Telemetry Header inside Pinned Stage */}
-          <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-4 z-30 flex-shrink-0">
+          <div className="telemetry-hud max-w-7xl mx-auto w-full flex items-center justify-between px-4 z-30 flex-shrink-0">
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
               <span className="font-mono text-xs tracking-widest text-hud-white uppercase font-semibold">
@@ -242,15 +309,22 @@ export function ProjectsHighlightsCarousel() {
           <div
             ref={viewportRef}
             data-cursor="drag"
-            className="relative w-full my-auto overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none py-4"
+            className="relative w-full my-auto overflow-x-visible scrollbar-none cursor-grab active:cursor-grabbing select-none py-4"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            <div ref={trackRef} className="flex items-center gap-8 sm:gap-12 w-max px-6 sm:px-12 py-2">
+            <div
+              ref={trackRef}
+              className="flex items-center gap-8 sm:gap-12 w-max px-6 sm:px-12 py-2 will-change-transform"
+            >
               {projects.map((proj, idx) => (
                 <article
                   key={proj.data.slug}
-                  onClick={() => openProject(proj.data.slug)}
-                  className="group relative w-[320px] sm:w-[460px] md:w-[540px] lg:w-[600px] h-[480px] sm:h-[540px] md:h-[580px] flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.015]"
+                  onClick={() => {
+                    if (!hasMovedRef.current) {
+                      openProject(proj.data.slug);
+                    }
+                  }}
+                  className="highlight-card group relative w-[320px] sm:w-[460px] md:w-[540px] lg:w-[600px] h-[480px] sm:h-[540px] md:h-[580px] flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.015]"
                 >
                   <ProjectPoster project={proj.data} index={idx} />
                 </article>
@@ -264,12 +338,12 @@ export function ProjectsHighlightsCarousel() {
           </div>
 
           {/* Bottom Progress Bar & Slide Counter */}
-          <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-4 flex-shrink-0">
+          <div className="telemetry-hud max-w-7xl mx-auto w-full flex items-center justify-between px-4 flex-shrink-0">
             {/* Track Line */}
             <div className="relative w-48 sm:w-64 h-[2px] bg-hud-dim/30 rounded-full overflow-hidden">
               <div
                 ref={thumbRef}
-                className="absolute top-0 left-0 w-12 h-full bg-cyber-red rounded-full transition-transform duration-75 ease-linear"
+                className="absolute top-0 left-0 w-12 h-full bg-cyber-red rounded-full will-change-transform"
               />
             </div>
 

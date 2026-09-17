@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { ProjectData } from "@/lib/types";
@@ -119,7 +119,7 @@ export function ProjectPoster({ project, index }: ProjectPosterProps) {
               <span>CONFIDENCE: MAX</span>
             </div>
           </div>
-        ) : slug === "project-cloud-inference" ? (
+        ) : slug === "project-cloud-gpu-pipeline" || slug === "project-cloud-inference" ? (
           // GPU Server Telemetry Box
           <div className="relative z-10 w-52 flex flex-col gap-2 p-4 rounded bg-obsidian-surface border border-hud-dim/40 font-mono">
             <div className="flex items-center justify-between text-xs">

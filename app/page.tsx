@@ -34,7 +34,7 @@ export default function Home() {
         <ProjectsHighlightsCarousel />
 
         {/* Cinematic Scroll-driven Projects Sequence */}
-        <section id="projects" className="relative py-12">
+        <section id="projects" className="relative z-10 bg-obsidian py-12">
           <div className="flex flex-col gap-0">
             {projects.map((proj, idx) => (
               <ProjectSection
