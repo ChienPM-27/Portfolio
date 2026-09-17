@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef } from "react";
 import { profile } from "@/data/profile";
@@ -51,72 +51,6 @@ export function Hero() {
           },
           "-=0.5"
         );
-
-      // Smooth mouse parallax with quickTo (high-perf, no jank)
-      const hero = containerRef.current;
-      if (!hero) return;
-
-      const leftX = leftGateRef.current
-        ? gsap.quickTo(leftGateRef.current, "x", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const leftY = leftGateRef.current
-        ? gsap.quickTo(leftGateRef.current, "y", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const leftRotY = leftGateRef.current
-        ? gsap.quickTo(leftGateRef.current, "rotationY", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const leftRotX = leftGateRef.current
-        ? gsap.quickTo(leftGateRef.current, "rotationX", { duration: 0.8, ease: "power2.out" })
-        : null;
-
-      const rightX = rightGateRef.current
-        ? gsap.quickTo(rightGateRef.current, "x", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const rightY = rightGateRef.current
-        ? gsap.quickTo(rightGateRef.current, "y", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const rightRotY = rightGateRef.current
-        ? gsap.quickTo(rightGateRef.current, "rotationY", { duration: 0.8, ease: "power2.out" })
-        : null;
-      const rightRotX = rightGateRef.current
-        ? gsap.quickTo(rightGateRef.current, "rotationX", { duration: 0.8, ease: "power2.out" })
-        : null;
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const rect = hero.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-        leftX?.(x * -20);
-        leftY?.(y * -12);
-        leftRotY?.(x * 6);
-        leftRotX?.(-y * 6);
-
-        rightX?.(x * 20);
-        rightY?.(y * -12);
-        rightRotY?.(x * -6);
-        rightRotX?.(-y * 6);
-      };
-
-      const handleMouseLeave = () => {
-        leftX?.(0);
-        leftY?.(0);
-        leftRotY?.(0);
-        leftRotX?.(0);
-
-        rightX?.(0);
-        rightY?.(0);
-        rightRotY?.(0);
-        rightRotX?.(0);
-      };
-
-      hero.addEventListener("mousemove", handleMouseMove);
-      hero.addEventListener("mouseleave", handleMouseLeave);
-
-      return () => {
-        hero.removeEventListener("mousemove", handleMouseMove);
-        hero.removeEventListener("mouseleave", handleMouseLeave);
-      };
     },
     { scope: containerRef }
   );
