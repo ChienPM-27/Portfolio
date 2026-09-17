@@ -11,7 +11,7 @@ export function AboutSection() {
         {/* Section Header */}
         <div className="flex items-center gap-3 mb-10">
           <span className="font-mono text-xs text-cyber-red font-semibold tracking-wider">
-            // 05
+            // 03
           </span>
           <span className="font-display text-sm tracking-[0.2em] uppercase text-hud-muted">
             About & Background

@@ -48,6 +48,13 @@ export function Navigation() {
           >
             About
           </a>
+          <a
+            href="#contact"
+            data-cursor="pointer"
+            className="font-display text-xs tracking-[0.2em] uppercase text-hud-muted hover:text-cyber-red transition-colors hidden sm:inline-block"
+          >
+            Contact
+          </a>
           {isScrolled && (
             <a
               href={profile.links.github}

@@ -236,9 +236,10 @@ export function ProjectsHighlightsCarousel() {
   return (
     <section
       ref={containerRef}
-      id="projects-highlights"
+      id="projects"
       className="relative w-full bg-obsidian border-t border-hud-dim/20 z-20"
     >
+      <div id="projects-highlights" className="absolute top-0 left-0 pointer-events-none" />
       {/* Pinned Stage Viewport (Locks cleanly in screen during the scrub sequence) */}
       <div
         ref={pinStageRef}

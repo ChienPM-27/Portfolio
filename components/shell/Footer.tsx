@@ -16,29 +16,6 @@ const MARQUEE_ITEMS = [
   "SAI GON UNIVERSITY // 2024–2029",
 ];
 
-const STATS = [
-  {
-    label: "GPU Utilization",
-    value: "94.2%",
-    subtext: "Batch Tensor Optimization",
-  },
-  {
-    label: "Cloud Inference Latency",
-    value: "< 45ms",
-    subtext: "Async GPU Pipeline",
-  },
-  {
-    label: "Academic Standing",
-    value: "Sai Gon University",
-    subtext: "2024–2029 • B.Eng IT",
-  },
-  {
-    label: "System Architecture",
-    value: "4 Projects",
-    subtext: "Modular Interactive Scenes",
-  },
-];
-
 export function Footer() {
   const marqueeRef = useRef<HTMLDivElement>(null);
 
@@ -83,25 +60,6 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Verified Technical Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto px-6 w-full">
-        {STATS.map((stat, i) => (
-          <div
-            key={i}
-            className="p-5 rounded-xl bg-obsidian/80 border border-hud-dim/20 hover:border-cyber-red/30 transition-all flex flex-col justify-between gap-2"
-          >
-            <div className="text-xs font-mono text-hud-dim">
-              {stat.label}
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold font-display tracking-wider text-cyber-red">
-              {stat.value}
-            </div>
-            <div className="text-[11px] font-mono text-hud-muted">
-              {stat.subtext}
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Baseline Navigation & Attribution */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 max-w-6xl mx-auto px-6 w-full pt-6 border-t border-hud-dim/20">

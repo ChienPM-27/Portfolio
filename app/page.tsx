@@ -1,10 +1,8 @@
 import { Navigation } from "@/components/shell/Navigation";
 import { Hero } from "@/components/hero/Hero";
 import { ProjectsHighlightsCarousel } from "@/components/projects/ProjectsHighlightsCarousel";
-import { ProjectSection } from "@/components/projects/ProjectSection";
 import { AboutSection } from "@/components/about/AboutSection";
 import { ContactSection } from "@/components/contact/ContactSection";
-import { projects } from "@/projects/registry";
 import { Footer } from "@/components/shell/Footer";
 import { TechnicalBackground } from "@/components/shell/TechnicalBackground";
 import { TechnicalCursor } from "@/components/shell/TechnicalCursor";
@@ -32,20 +30,6 @@ export default function Home() {
 
         {/* Logotomia-inspired Dynamic Momentum Drag Carousel */}
         <ProjectsHighlightsCarousel />
-
-        {/* Cinematic Scroll-driven Projects Sequence */}
-        <section id="projects" className="relative z-10 bg-obsidian py-12">
-          <div className="flex flex-col gap-0">
-            {projects.map((proj, idx) => (
-              <ProjectSection
-                key={proj.data.slug}
-                project={proj}
-                index={idx}
-                totalProjects={projects.length}
-              />
-            ))}
-          </div>
-        </section>
 
         {/* Editorial About & Background */}
         <AboutSection />
