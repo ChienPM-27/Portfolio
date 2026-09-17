@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/shell/Navigation";
 import { Hero } from "@/components/hero/Hero";
+import { ProjectsHighlightsCarousel } from "@/components/projects/ProjectsHighlightsCarousel";
 import { ProjectSection } from "@/components/projects/ProjectSection";
 import { AboutSection } from "@/components/about/AboutSection";
 import { ContactSection } from "@/components/contact/ContactSection";
@@ -7,10 +8,15 @@ import { projects } from "@/projects/registry";
 import { Footer } from "@/components/shell/Footer";
 import { TechnicalBackground } from "@/components/shell/TechnicalBackground";
 import { TechnicalCursor } from "@/components/shell/TechnicalCursor";
+import { ProjectDetailProvider } from "@/lib/project-detail-context";
+import { ImmersiveProjectDetail } from "@/components/projects/ImmersiveProjectDetail";
 
 export default function Home() {
   return (
-    <div className="relative flex flex-col min-h-screen bg-obsidian text-hud-white overflow-x-clip">
+    <ProjectDetailProvider>
+      <div className="relative flex flex-col min-h-screen bg-obsidian text-hud-white overflow-x-clip">
+        {/* Immersive Scroll-Hijacked Detail View for Projects */}
+        <ImmersiveProjectDetail />
       {/* Reusable Canvas 2D Technical Multi-Layer Background */}
       <TechnicalBackground />
 
@@ -21,8 +27,11 @@ export default function Home() {
       <Navigation />
 
       <main className="flex-1 flex flex-col z-10">
-        {/* Editorial Minimal Hero */}
+        {/* Editorial Minimal Hero with Dual Gateway & 3D Interactive Core */}
         <Hero />
+
+        {/* Logotomia-inspired Dynamic Momentum Drag Carousel */}
+        <ProjectsHighlightsCarousel />
 
         {/* Cinematic Scroll-driven Projects Sequence */}
         <section id="projects" className="relative py-12">
@@ -48,5 +57,6 @@ export default function Home() {
       {/* Grounded Footer & Telemetry */}
       <Footer />
     </div>
+  </ProjectDetailProvider>
   );
 }

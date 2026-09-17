@@ -11,6 +11,11 @@ export interface ProjectMetric {
   value: string;
 }
 
+export interface ProjectDetailSection {
+  heading: string;
+  points: string[];
+}
+
 export interface ProjectData {
   slug: string;
   title: string;
@@ -21,6 +26,13 @@ export interface ProjectData {
   techStack: string[];
   metrics?: ProjectMetric[];
   links: ProjectLink[];
+  /**
+   * Optional deep-dive content shown in the "View System Design" modal.
+   * Each section renders as a labeled block of bullet points — e.g. one
+   * section per architecture layer (Mobile, Server, Backend, Frontend).
+   * If omitted, ProjectDetails will not render a "View System Design" button.
+   */
+  detailSections?: ProjectDetailSection[];
 }
 
 export interface VisualSceneProps {

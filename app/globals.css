@@ -68,6 +68,15 @@ body {
 }
 
 /* Utilities */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes gradient-shift {
   0% {
     background-position: 0% 50%;

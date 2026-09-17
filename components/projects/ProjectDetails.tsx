@@ -1,17 +1,19 @@
 import React from "react";
 import { ProjectData } from "@/lib/types";
-import { Github, ArrowUpRight } from "lucide-react";
+import { Github, ArrowUpRight, ArrowRight } from "lucide-react";
 
 interface ProjectDetailsProps {
   project: ProjectData;
   index: number;
   totalProjects?: number;
+  onViewDetails?: () => void;
 }
 
 export function ProjectDetails({
   project,
   index,
   totalProjects = 4,
+  onViewDetails,
 }: ProjectDetailsProps) {
   const currentNum = String(index + 1).padStart(2, "0");
   const totalNum = String(totalProjects).padStart(2, "0");
@@ -80,8 +82,19 @@ export function ProjectDetails({
       </div>
 
       {/* Action Links */}
-      {project.links && project.links.length > 0 && (
+      {(project.links?.length > 0 || project.detailSections?.length) && (
         <div className="flex flex-wrap items-center gap-3 pt-3">
+          {project.detailSections && project.detailSections.length > 0 && (
+            <button
+              type="button"
+              onClick={onViewDetails}
+              data-cursor="pointer"
+              className="pill-btn pill-btn-red !py-2 !px-4 text-[10px]"
+            >
+              <span>View System Design</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
           {project.links.map((link, i) => {
             const isGithub = link.type === "github";
             return (

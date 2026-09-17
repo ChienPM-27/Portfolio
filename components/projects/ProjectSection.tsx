@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { ProjectDefinition } from "@/lib/types";
 import { ProjectDetails } from "./ProjectDetails";
 import { SceneContainer } from "./SceneContainer";
+import { useProjectDetail } from "@/lib/project-detail-context";
 import { useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { isReducedMotionPreferred } from "@/lib/scroll-utils";
 import gsap from "gsap";
@@ -33,6 +34,7 @@ export function ProjectSection({
     isActive: false,
     direction: 1,
   });
+  const { openProject } = useProjectDetail();
 
   const isEven = index % 2 === 0;
   const currentNum = String(index + 1).padStart(2, "0");
@@ -137,6 +139,7 @@ export function ProjectSection({
                 project={project.data}
                 index={index}
                 totalProjects={totalProjects}
+                onViewDetails={() => openProject(project.data.slug)}
               />
             </div>
             {/* Visual RIGHT (col-span-7) */}
@@ -175,6 +178,7 @@ export function ProjectSection({
                 project={project.data}
                 index={index}
                 totalProjects={totalProjects}
+                onViewDetails={() => openProject(project.data.slug)}
               />
             </div>
           </>

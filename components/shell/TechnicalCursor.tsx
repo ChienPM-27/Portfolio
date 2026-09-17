@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 export function TechnicalCursor() {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [cursorState, setCursorState] = useState<"default" | "hover" | "project">("default");
+  const [cursorState, setCursorState] = useState<"default" | "hover" | "project" | "drag" | "explore">("default");
   const [isVisible, setIsVisible] = useState(false);
 
   const dotRef = useRef<HTMLDivElement>(null);
@@ -41,7 +41,11 @@ export function TechnicalCursor() {
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      if (target.closest("[data-cursor='project']")) {
+      if (target.closest("[data-cursor='drag']")) {
+        setCursorState("drag");
+      } else if (target.closest("[data-cursor='explore']")) {
+        setCursorState("explore");
+      } else if (target.closest("[data-cursor='project']")) {
         setCursorState("project");
       } else if (target.closest("a, button, [data-cursor='pointer'], input, textarea")) {
         setCursorState("hover");
@@ -83,7 +87,7 @@ export function TechnicalCursor() {
 
   return (
     <div
-      className={`fixed inset-0 pointer-events-none z-50 transition-opacity duration-200 ${
+      className={`fixed inset-0 pointer-events-none z-[110] transition-opacity duration-200 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       aria-hidden="true"
@@ -100,13 +104,19 @@ export function TechnicalCursor() {
         ref={ringRef}
         style={{ willChange: "transform" }}
         className={`fixed top-0 left-0 flex items-center justify-center rounded-full transition-[width,height,border-color,background-color] duration-150 ease-out ${
-          cursorState === "project"
-            ? "-ml-6 -mt-6 w-12 h-12 border border-cyber-red/80 bg-obsidian/70 backdrop-blur-xs text-[8px] font-mono tracking-widest text-cyber-red"
+          cursorState === "drag"
+            ? "-ml-9 -mt-9 w-[72px] h-[72px] border border-hud-white bg-hud-white text-obsidian text-[9px] font-mono font-bold tracking-widest shadow-xl shadow-white/20 select-none"
+            : cursorState === "explore"
+            ? "-ml-9 -mt-9 w-[72px] h-[72px] border border-hud-white bg-hud-white text-obsidian text-[9px] font-mono font-bold tracking-widest shadow-xl shadow-white/20 select-none"
+            : cursorState === "project"
+            ? "-ml-6 -mt-6 w-12 h-12 border border-cyber-red/80 bg-obsidian/70 backdrop-blur-xs text-[8px] font-mono tracking-widest text-cyber-red select-none"
             : cursorState === "hover"
             ? "-ml-4 -mt-4 w-8 h-8 border border-hud-white/60 bg-hud-white/10"
             : "-ml-3 -mt-3 w-6 h-6 border border-hud-white/25"
         }`}
       >
+        {cursorState === "drag" && <span>DRAG</span>}
+        {cursorState === "explore" && <span>EXPLORE</span>}
         {cursorState === "project" && <span>VIEW</span>}
       </div>
     </div>
