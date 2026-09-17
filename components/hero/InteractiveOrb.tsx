@@ -33,8 +33,8 @@ export function InteractiveOrb() {
         aria-hidden="true"
       />
 
-      {/* Circular Mask Frame (Logotomia mechanism) */}
-      <div className="relative w-full h-full rounded-full overflow-hidden border border-hud-white/10 bg-obsidian/80 shadow-[0_20px_80px_rgba(0,0,0,0.8),inset_0_0_50px_rgba(255,255,255,0.03)] backdrop-blur-xs flex items-center justify-center">
+      {/* Seamless 3D Particle Stage (Logotomia pure atmosphere) */}
+      <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
         {/* Spline Viewer */}
         {isSplineLoaded ? (
           React.createElement("spline-viewer", {

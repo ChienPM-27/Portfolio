@@ -93,35 +93,35 @@ export function Hero() {
       {/* Hero Stage: Perfectly Centered 3D Interactive Core + Symmetrical Dual Gateways */}
       <div className="relative flex-1 flex items-center justify-between max-w-7xl mx-auto w-full my-auto py-4 z-10">
         
-        {/* Center 3D Interactive Core (Absolute Center with Equal Top/Bottom Margins) */}
+        {/* Center 3D Interactive Core (Absolute Center with Full Cinematic Scale) */}
         <div
           ref={orbWrapperRef}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center pointer-events-auto"
           style={{
-            width: "min(490px, 47vh, 78vw)",
-            height: "min(490px, 47vh, 78vw)",
+            width: "min(1150px, 90vh, 98vw)",
+            height: "min(1150px, 90vh, 98vw)",
           }}
         >
           <InteractiveOrb />
-
-          {/* Compass Scroll Cue pointing down to Highlights with Safe Clearance */}
-          <a
-            href="#projects-highlights"
-            data-cursor="pointer"
-            className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-hud-muted hover:text-hud-white transition-colors group z-20"
-            aria-label="Scroll to Highlights"
-          >
-            <div className="w-8 h-8 rounded-full border border-hud-dim/40 flex items-center justify-center group-hover:border-hud-white transition-colors animate-[spin_12s_linear_infinite]">
-              <svg viewBox="0 0 40 40" fill="none" className="w-4 h-4">
-                <circle cx="20" cy="20" r="18" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
-                <path d="M20 12V28M20 28L15 23M20 28L25 23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span className="font-mono text-[9px] tracking-[0.2em] uppercase font-medium">
-              SCROLL
-            </span>
-          </a>
         </div>
+
+        {/* Compass Scroll Cue pointing down to Highlights with Safe Clearance */}
+        <a
+          href="#projects-highlights"
+          data-cursor="pointer"
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-hud-muted hover:text-hud-white transition-colors group z-20 pointer-events-auto"
+          aria-label="Scroll to Highlights"
+        >
+          <div className="w-7 h-7 rounded-full border border-hud-dim/40 flex items-center justify-center group-hover:border-hud-white transition-colors animate-[spin_12s_linear_infinite]">
+            <svg viewBox="0 0 40 40" fill="none" className="w-3.5 h-3.5">
+              <circle cx="20" cy="20" r="18" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
+              <path d="M20 12V28M20 28L15 23M20 28L25 23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span className="font-mono text-[9px] tracking-[0.2em] uppercase font-medium">
+            SCROLL
+          </span>
+        </a>
 
         {/* Left Gateway: AI & Machine Learning (Static, clean typography + arrow) */}
         <a
