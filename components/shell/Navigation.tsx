@@ -9,14 +9,14 @@ export function Navigation() {
   const isScrolled = useScrollElevation(20);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
-      <div
-        className={`flex items-center justify-between px-6 sm:px-10 py-4 sm:py-5 transition-all duration-300 ${
-          isScrolled
-            ? "bg-obsidian/90 backdrop-blur-xl border-b border-hud-dim/20"
-            : "bg-transparent"
-        }`}
-      >
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        isScrolled
+          ? "bg-obsidian/90 backdrop-blur-xl border-b border-hud-dim/20"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6 sm:px-10 lg:px-12 py-3.5 sm:py-4">
         {/* Logo — Gleec style: bold name + thin descriptor */}
         <a
           href="#"

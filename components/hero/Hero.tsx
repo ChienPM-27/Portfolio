@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef } from "react";
 import { profile } from "@/data/profile";
@@ -12,14 +12,14 @@ export function Hero() {
   const rightGateRef = useRef<HTMLAnchorElement>(null);
   const orbWrapperRef = useRef<HTMLDivElement>(null);
 
-  // GSAP Entrance & Mouse Parallax Tilt (Logotomia mechanism)
+  // GSAP Entrance (Fade & Slide in once, then completely static)
   useGSAP(
     () => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       tl.from(".hero-telemetry-top", {
         opacity: 0,
-        y: -20,
+        y: -15,
         duration: 0.8,
       })
         .from(
@@ -36,7 +36,7 @@ export function Hero() {
           [leftGateRef.current, rightGateRef.current],
           {
             opacity: 0,
-            y: 30,
+            y: 20,
             duration: 0.9,
             stagger: 0.15,
           },
@@ -58,60 +58,61 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[92vh] sm:min-h-screen w-full flex flex-col justify-between px-6 sm:px-12 pt-24 pb-6 overflow-hidden bg-radial from-obsidian-light/40 via-obsidian to-obsidian"
+      className="relative h-screen min-h-[640px] max-h-[1080px] w-full flex flex-col justify-between px-6 sm:px-10 lg:px-12 pt-20 pb-5 overflow-hidden bg-radial from-obsidian-light/40 via-obsidian to-obsidian"
     >
-      {/* Top Identity, Bio Context & Telemetry (Replaced generic focus with actual bio context) */}
-      <div className="hero-telemetry-top flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full z-20 pb-4 border-b border-hud-dim/20 flex-shrink-0">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
-            <span className="font-mono text-xs tracking-widest text-cyber-red uppercase font-semibold">
-              // {profile.role}
-            </span>
-            <span className="text-hud-dim text-xs font-mono">•</span>
-            <span className="font-mono text-xs text-hud-white font-medium tracking-wider">
-              {profile.name}
-            </span>
-            <span className="hidden sm:inline-flex items-center ml-2 px-2.5 py-0.5 rounded-full border border-cyber-red/30 bg-cyber-red/10 text-[9px] font-mono text-cyber-red">
-              AVAILABLE FOR ROLES
-            </span>
-          </div>
+      {/* Top Telemetry & Bio Bar (Symmetrical 3-column layout matching Bottom Telemetry) */}
+      <div className="hero-telemetry-top flex flex-row items-center justify-between max-w-7xl mx-auto w-full z-20 py-3 border-b border-hud-dim/20 flex-shrink-0 font-mono text-[11px]">
+        {/* Left: Identity & Role */}
+        <div className="flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
+          <span className="text-cyber-red uppercase font-semibold tracking-widest">
+            // {profile.role}
+          </span>
+          <span className="text-hud-dim">•</span>
+          <span className="text-hud-white font-medium tracking-wider">
+            {profile.name}
+          </span>
+          <span className="hidden lg:inline-flex items-center ml-2 px-2 py-0.5 rounded border border-cyber-red/30 bg-cyber-red/10 text-[9px] text-cyber-red">
+            AVAILABLE
+          </span>
         </div>
 
-        {/* Introduction / Context about Pham Minh Chien */}
-        <div className="max-w-md md:text-right">
-          <div className="font-mono text-[11px] text-hud-white tracking-wide font-medium">
-            Sai Gon University <span className="text-hud-dim">•</span> Information Technology
-          </div>
-          <p className="font-mono text-[11px] text-hud-muted leading-relaxed mt-0.5">
-            Engineering practical AI systems spanning Computer Vision, Single-Image 3D Reconstruction &amp; Cloud GPU inference pipelines.
-          </p>
+        {/* Center: System Focus / Specialization */}
+        <div className="hidden md:block text-hud-muted tracking-widest uppercase text-[10px]">
+          COMPUTER VISION <span className="text-hud-dim mx-1.5">•</span> 3D RECONSTRUCTION
+        </div>
+
+        {/* Right: Academic Context */}
+        <div className="text-right">
+          <span className="text-hud-white font-medium">SAI GON UNIVERSITY</span>
+          <span className="text-hud-dim mx-1.5">//</span>
+          <span className="text-hud-muted">IT</span>
         </div>
       </div>
 
-      {/* Hero Stage: Perfectly Centered 3D Interactive Core + Floating Logotomia-style Gateways */}
-      <div className="relative flex-1 flex items-center justify-between max-w-7xl mx-auto w-full my-auto py-6 sm:py-8 z-10 min-h-[460px]">
+      {/* Hero Stage: Perfectly Centered 3D Interactive Core + Symmetrical Dual Gateways */}
+      <div className="relative flex-1 flex items-center justify-between max-w-7xl mx-auto w-full my-auto py-4 z-10">
         
-        {/* Center 3D Interactive Core (Absolute Center, mathematically guaranteed) */}
+        {/* Center 3D Interactive Core (Absolute Center with Equal Top/Bottom Margins) */}
         <div
           ref={orbWrapperRef}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center pointer-events-auto"
           style={{
-            width: "min(560px, 56vh, 85vw)",
-            height: "min(560px, 56vh, 85vw)",
+            width: "min(490px, 47vh, 78vw)",
+            height: "min(490px, 47vh, 78vw)",
           }}
         >
           <InteractiveOrb />
 
-          {/* Compass Scroll Cue pointing down to Highlights */}
+          {/* Compass Scroll Cue pointing down to Highlights with Safe Clearance */}
           <a
             href="#projects-highlights"
             data-cursor="pointer"
-            className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-hud-muted hover:text-hud-white transition-colors group z-20"
+            className="absolute -bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-hud-muted hover:text-hud-white transition-colors group z-20"
             aria-label="Scroll to Highlights"
           >
-            <div className="w-9 h-9 rounded-full border border-hud-dim/40 flex items-center justify-center group-hover:border-hud-white transition-colors animate-[spin_12s_linear_infinite]">
-              <svg viewBox="0 0 40 40" fill="none" className="w-5 h-5">
+            <div className="w-8 h-8 rounded-full border border-hud-dim/40 flex items-center justify-center group-hover:border-hud-white transition-colors animate-[spin_12s_linear_infinite]">
+              <svg viewBox="0 0 40 40" fill="none" className="w-4 h-4">
                 <circle cx="20" cy="20" r="18" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
                 <path d="M20 12V28M20 28L15 23M20 28L25 23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -122,7 +123,7 @@ export function Hero() {
           </a>
         </div>
 
-        {/* Left Gateway: Research & 3D Vision (Clean Logotomia typography + arrow) */}
+        {/* Left Gateway: Research & 3D Vision (Static, clean typography + arrow) */}
         <a
           ref={leftGateRef}
           href="#projects-highlights"
@@ -159,7 +160,7 @@ export function Hero() {
           </div>
         </a>
 
-        {/* Right Gateway: Professional Projects (Clean Logotomia typography + arrow) */}
+        {/* Right Gateway: Professional Projects (Static, clean typography + arrow) */}
         <a
           ref={rightGateRef}
           href="#projects-highlights"
@@ -198,8 +199,8 @@ export function Hero() {
 
       </div>
 
-      {/* Hero Bottom Telemetry Bar */}
-      <div className="hero-telemetry-bottom flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-hud-dim/20 max-w-7xl mx-auto w-full font-mono text-[10px] tracking-wider text-hud-muted z-20 flex-shrink-0">
+      {/* Hero Bottom Telemetry Bar (Symmetrical with Top Telemetry) */}
+      <div className="hero-telemetry-bottom flex flex-row items-center justify-between max-w-7xl mx-auto w-full z-20 py-3 border-t border-hud-dim/20 flex-shrink-0 font-mono text-[10px] tracking-wider text-hud-muted">
         <div>
           <span className="text-hud-dim mr-2">GEOLOCATION:</span>
           <span className="text-hud-white">10° 46&apos; 37&quot; N / 106° 41&apos; 43&quot; E • HO CHI MINH CITY</span>
