@@ -125,7 +125,7 @@ if (typeof window !== "undefined") {
   useGLTF.preload("/models/mesh_textured.glb");
 }
 
-export default function Scene({ progress }: VisualSceneProps) {
+export default function Scene({ progress, isActive = true }: VisualSceneProps) {
   const stage =
     progress < 0.28
       ? "PHASE 01 // WIREFRAME TOPOLOGY RECONSTRUCTION"
@@ -141,6 +141,7 @@ export default function Scene({ progress }: VisualSceneProps) {
       <Canvas
         camera={{ position: [0, 0, 4.0], fov: 45 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        frameloop={isActive ? "always" : "never"}
         className="w-full h-full"
       >
         <ambientLight intensity={1.8} />

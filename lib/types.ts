@@ -26,6 +26,8 @@ export interface ProjectData {
   techStack: string[];
   metrics?: ProjectMetric[];
   links: ProjectLink[];
+  poster?: string;
+  previewGradient?: string;
   /**
    * Optional deep-dive content shown in the "View System Design" modal.
    * Each section renders as a labeled block of bullet points — e.g. one

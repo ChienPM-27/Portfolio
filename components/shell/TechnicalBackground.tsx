@@ -64,10 +64,10 @@ export function TechnicalBackground() {
     const reducedMotion = isReducedMotionPreferred();
 
     // ----------------------------------------------------
-    // 1. Particle Initialization
+    // 1. Particle Initialization (Balanced for performance)
     // ----------------------------------------------------
     const isMobile = width < 768;
-    const particleCount = isMobile ? 30 : Math.min(Math.floor((width * height) / 16000), 75);
+    const particleCount = isMobile ? 18 : 42;
 
     const colors = [
       { r: 214, g: 214, b: 214, isRed: false },
@@ -260,10 +260,21 @@ export function TechnicalBackground() {
       animationFrameId = requestAnimationFrame(render);
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     render();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("resize", handleResize);

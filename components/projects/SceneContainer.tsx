@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, ComponentType } from "react";
+import React, { Suspense, ComponentType, useState, useEffect, useRef } from "react";
 import { VisualSceneProps } from "@/lib/types";
 
 interface SceneContainerProps {
@@ -27,10 +27,37 @@ export function SceneContainer({
   isActive,
   direction,
 }: SceneContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInViewport, setIsInViewport] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setIsInViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { rootMargin: "200px 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Scene is only active when both in viewport AND active in scroll lifecycle
+  const sceneActive = isInViewport && isActive;
+
   return (
-    <div className="w-full h-[380px] sm:h-[460px] md:h-[500px] relative rounded-xl overflow-hidden bg-obsidian-light/80 border border-hud-dim/20 shadow-2xl block">
+    <div
+      ref={containerRef}
+      className="w-full h-[380px] sm:h-[460px] md:h-[500px] relative rounded-xl overflow-hidden bg-obsidian-light/80 border border-hud-dim/20 shadow-2xl block"
+    >
       <Suspense fallback={<SceneLoadingFallback />}>
-        <Scene progress={progress} isActive={isActive} direction={direction} />
+        <Scene progress={progress} isActive={sceneActive} direction={direction} />
       </Suspense>
     </div>
   );

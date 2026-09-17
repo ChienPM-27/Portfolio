@@ -1,10 +1,33 @@
-"use client";
+﻿"use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { VisualSceneProps } from "@/lib/types";
 
-export default function Scene({ progress, isActive }: VisualSceneProps) {
+export default function Scene({ progress, isActive = true }: VisualSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
+
+  // Generate stable point cloud points representing 3D object silhouette ONCE
+  const points = useMemo(() => {
+    const pointCount = 90;
+    const pts: { x: number; y: number; z: number; targetX: number; targetY: number }[] = [];
+
+    for (let i = 0; i < pointCount; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = Math.cbrt(Math.random()) * 0.85;
+
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = r * Math.cos(phi);
+
+      pts.push({ x, y, z, targetX: 0, targetY: 0 });
+    }
+    return pts;
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,31 +46,17 @@ export default function Scene({ progress, isActive }: VisualSceneProps) {
 
     window.addEventListener("resize", handleResize);
 
-    // Generate stable point cloud points representing a 3D object silhouette (chair / object)
-    const pointCount = 90;
-    const points: { x: number; y: number; z: number; targetX: number; targetY: number }[] = [];
-
-    for (let i = 0; i < pointCount; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = Math.cbrt(Math.random()) * 0.85;
-
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-
-      points.push({ x, y, z, targetX: 0, targetY: 0 });
-    }
-
     let animId: number;
     let localTime = 0;
 
     const render = () => {
+      // If inactive / offscreen, do not schedule next frame
+      if (!isActive) return;
+
       localTime += 0.02;
       ctx.clearRect(0, 0, width, height);
 
+      const curProgress = progressRef.current;
       const cx = width / 2;
       const cy = height / 2;
       const scale = Math.min(width, height) * 0.32;
@@ -94,82 +103,87 @@ export default function Scene({ progress, isActive }: VisualSceneProps) {
       ctx.lineTo(boxX + boxW, boxY + boxH - cornerLen);
       ctx.stroke();
 
-      // 2. Scanline sweeping based on scroll progress
-      const scanY = boxY + ((progress * 2.2 + localTime * 0.2) % 1) * boxH;
-      const grad = ctx.createLinearGradient(0, scanY - 20, 0, scanY);
-      grad.addColorStop(0, "rgba(230, 30, 30, 0)");
-      grad.addColorStop(1, "rgba(230, 30, 30, 0.25)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(boxX, scanY - 20, boxW, 20);
-
-      ctx.strokeStyle = "rgba(230, 30, 30, 0.7)";
+      // 2. Center Crosshair
+      ctx.strokeStyle = "rgba(230, 30, 30, 0.45)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(boxX, scanY);
-      ctx.lineTo(boxX + boxW, scanY);
+      ctx.moveTo(cx - 10, cy);
+      ctx.lineTo(cx + 10, cy);
+      ctx.moveTo(cx, cy - 10);
+      ctx.lineTo(cx, cy + 10);
       ctx.stroke();
 
-      // 3. Rotating 3D Point Cloud Projector (Chamfer Distance vectors)
-      const rotY = progress * Math.PI * 2.5 + localTime * 0.4;
-      const rotX = Math.sin(progress * Math.PI) * 0.4;
+      // 3. Dynamic Bounding Box (expands / snaps based on progress)
+      const bboxW = boxW * (0.42 + curProgress * 0.32);
+      const bboxH = boxH * (0.45 + curProgress * 0.35);
+      const bboxX = cx - bboxW / 2;
+      const bboxY = cy - bboxH / 2;
 
-      const cosY = Math.cos(rotY);
-      const sinY = Math.sin(rotY);
-      const cosX = Math.cos(rotX);
-      const sinX = Math.sin(rotX);
+      ctx.strokeStyle = "rgba(230, 30, 30, 0.8)";
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(bboxX, bboxY, bboxW, bboxH);
+      ctx.setLineDash([]);
 
-      const projectedPoints: { x: number; y: number; z: number }[] = [];
+      // Bbox Label
+      ctx.fillStyle = "#e61e1e";
+      ctx.font = "9px monospace";
+      ctx.fillText(`YOLO_V8 // CHAIR ${(85 + curProgress * 14.8).toFixed(1)}%`, bboxX, bboxY - 6);
+
+      // 4. Point Cloud / Feature Extraction Particles
+      const rotY = localTime * 0.4 + curProgress * Math.PI * 1.5;
+      const rotX = Math.sin(localTime * 0.3) * 0.2;
 
       for (let i = 0; i < points.length; i++) {
-        const p = points[i];
+        const pt = points[i];
 
         // 3D rotation
-        let x1 = p.x * cosY - p.z * sinY;
-        let z1 = p.x * sinY + p.z * cosY;
-        let y1 = p.y * cosX - z1 * sinX;
-        let z2 = p.y * sinX + z1 * cosX;
+        let x1 = pt.x * Math.cos(rotY) + pt.z * Math.sin(rotY);
+        let z1 = -pt.x * Math.sin(rotY) + pt.z * Math.cos(rotY);
+        let y1 = pt.y * Math.cos(rotX) - z1 * Math.sin(rotX);
+        z1 = pt.y * Math.sin(rotX) + z1 * Math.cos(rotX);
 
-        const depth = 2.4 / (2.4 + z2);
-        const px = cx + x1 * scale * depth;
-        const py = cy + y1 * scale * depth;
+        // Perspective projection
+        const fov = 2.4;
+        const pz = z1 + fov;
+        const px = (x1 / pz) * scale + cx;
+        const py = (y1 / pz) * scale + cy;
 
-        projectedPoints.push({ x: px, y: py, z: z2 });
+        // Visual morph: random scattered -> clustered mesh
+        const alpha = Math.max(0.2, (pz / (fov + 0.85)));
+        const pointSize = Math.max(1, 2.4 * (1 - z1 / 2));
 
-        // Draw node
-        const nodeAlpha = Math.max(0.15, (z2 + 1) * 0.45);
-        ctx.fillStyle = i % 4 === 0 ? "#e61e1e" : `rgba(214, 214, 214, ${nodeAlpha})`;
-        ctx.beginPath();
-        ctx.arc(px, py, (i % 4 === 0 ? 2.5 : 1.6) * depth, 0, Math.PI * 2);
-        ctx.fill();
-      }
+        ctx.fillStyle = i % 3 === 0 ? `rgba(230, 30, 30, ${alpha})` : `rgba(214, 214, 214, ${alpha * 0.85})`;
+        ctx.fillRect(px, py, pointSize, pointSize);
 
-      // Draw Chamfer Distance interconnection vectors
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < projectedPoints.length; i += 3) {
-        const p1 = projectedPoints[i];
-        for (let j = i + 1; j < Math.min(i + 5, projectedPoints.length); j++) {
-          const p2 = projectedPoints[j];
-          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (dist < scale * 0.55) {
-            ctx.strokeStyle = `rgba(214, 214, 214, ${0.12 * (1 - dist / (scale * 0.55))})`;
+        // Connect nearby points to simulate wireframe Delaunay edges
+        if (i > 0 && i % 4 === 0 && curProgress > 0.3) {
+          const prev = points[i - 1];
+          let px0 = prev.targetX;
+          let py0 = prev.targetY;
+          if (px0 && py0) {
+            ctx.strokeStyle = `rgba(214, 214, 214, ${alpha * 0.22 * curProgress})`;
             ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
+            ctx.moveTo(px, py);
+            ctx.lineTo(px0, py0);
             ctx.stroke();
           }
         }
+        pt.targetX = px;
+        pt.targetY = py;
       }
 
       animId = requestAnimationFrame(render);
     };
 
-    render();
+    if (isActive) {
+      render();
+    }
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", handleResize);
     };
-  }, [progress]);
+  }, [isActive, points]);
 
   const activePhase =
     progress < 0.35

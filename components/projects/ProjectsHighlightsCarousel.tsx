@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState, Suspense } from "react";
 import { projects } from "@/projects/registry";
 import { useProjectDetail } from "@/lib/project-detail-context";
+import { ProjectPoster } from "./ProjectPoster";
 import { useGSAP } from "@/lib/gsap";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -243,22 +244,14 @@ export function ProjectsHighlightsCarousel() {
                   </div>
                 </div>
 
-                {/* 3D Visual Preview Canvas / Media Box */}
+                {/* Static Technical Poster Preview Box (Zero WebGL overhead, instantaneous load) */}
                 <div className="relative w-full h-[240px] sm:h-[280px] rounded-xl overflow-hidden bg-obsidian border border-hud-dim/30 group-hover:border-hud-white/30 transition-all duration-300">
-                  <Suspense
-                    fallback={
-                      <div className="w-full h-full flex items-center justify-center bg-obsidian-light/50 font-mono text-[10px] text-hud-dim">
-                        LOADING 3D PREVIEW...
-                      </div>
-                    }
-                  >
-                    <div className="w-full h-full pointer-events-none transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                      <Scene progress={0.5} isActive={false} />
-                    </div>
-                  </Suspense>
+                  <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-500 ease-out">
+                    <ProjectPoster project={data} index={idx} />
+                  </div>
 
                   {/* Gradient Vignette & Click Cue */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-obsidian/90 via-transparent to-transparent pointer-events-none flex items-end p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 via-transparent to-transparent pointer-events-none flex items-end p-4">
                     <span className="font-mono text-[9px] tracking-widest text-hud-muted group-hover:text-hud-white uppercase transition-colors">
                       [ CLICK TO EXPAND DETAILS ]
                     </span>
