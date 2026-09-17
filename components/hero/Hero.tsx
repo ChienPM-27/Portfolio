@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef } from "react";
 import { profile } from "@/data/profile";
@@ -73,20 +73,20 @@ export function Hero() {
             {profile.name}
           </span>
           <span className="hidden lg:inline-flex items-center ml-2 px-2 py-0.5 rounded border border-cyber-red/30 bg-cyber-red/10 text-[9px] text-cyber-red">
-            AVAILABLE
+            SEEKING INTERNSHIP
           </span>
         </div>
 
         {/* Center: System Focus / Specialization */}
         <div className="hidden md:block text-hud-muted tracking-widest uppercase text-[10px]">
-          COMPUTER VISION <span className="text-hud-dim mx-1.5">•</span> 3D RECONSTRUCTION
+          AI ENGINEERING <span className="text-hud-dim mx-1.5">•</span> MACHINE LEARNING <span className="text-hud-dim mx-1.5">•</span> MODEL DEPLOYMENT
         </div>
 
         {/* Right: Academic Context */}
         <div className="text-right">
           <span className="text-hud-white font-medium">SAI GON UNIVERSITY</span>
           <span className="text-hud-dim mx-1.5">//</span>
-          <span className="text-hud-muted">IT</span>
+          <span className="text-hud-muted">IT STUDENT (2024–2029)</span>
         </div>
       </div>
 
@@ -123,7 +123,7 @@ export function Hero() {
           </a>
         </div>
 
-        {/* Left Gateway: Research & 3D Vision (Static, clean typography + arrow) */}
+        {/* Left Gateway: AI & Machine Learning (Static, clean typography + arrow) */}
         <a
           ref={leftGateRef}
           href="#projects-highlights"
@@ -134,13 +134,13 @@ export function Hero() {
             // 01 GATEWAY
           </span>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light uppercase tracking-tight text-hud-white leading-[0.9]">
-            Research &amp;<br />
+            AI &amp;<br />
             <span className="text-hud-muted group-hover:text-hud-white transition-colors">
-              3D Vision
+              Machine Learning
             </span>
           </h2>
           <p className="text-xs text-hud-muted mt-3 line-clamp-2 leading-relaxed">
-            Watertight mesh reconstruction, point clouds &amp; neural representations.
+            Data pipelines, deep learning models &amp; PyTorch workflows.
           </p>
           <div className="pt-4 flex items-center text-hud-white group-hover:-translate-x-3 transition-transform duration-300 ease-out">
             <svg
@@ -160,7 +160,7 @@ export function Hero() {
           </div>
         </a>
 
-        {/* Right Gateway: Professional Projects (Static, clean typography + arrow) */}
+        {/* Right Gateway: Featured Projects (Static, clean typography + arrow) */}
         <a
           ref={rightGateRef}
           href="#projects-highlights"
@@ -171,13 +171,13 @@ export function Hero() {
             // 02 GATEWAY
           </span>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light uppercase tracking-tight text-hud-white leading-[0.9]">
-            Professional<br />
+            Featured<br />
             <span className="text-hud-muted group-hover:text-hud-white transition-colors">
               Projects
             </span>
           </h2>
           <p className="text-xs text-hud-muted mt-3 line-clamp-2 leading-relaxed">
-            High-throughput FastAPI inference, GCP L4 GPU, async pipelines.
+            FastAPI backends, model integration &amp; interactive applications.
           </p>
           <div className="pt-4 flex items-center text-hud-white group-hover:translate-x-3 transition-transform duration-300 ease-out">
             <svg

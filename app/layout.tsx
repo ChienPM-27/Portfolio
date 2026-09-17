@@ -25,23 +25,23 @@ const teko = Teko({
 });
 
 export const metadata: Metadata = {
-  title: "Pham Minh Chien | AI Engineer",
+  title: "Pham Minh Chien | Aspiring AI Engineer",
   description:
-    "Personal portfolio of Pham Minh Chien — AI Engineer specializing in Computer Vision, Single-Image 3D Reconstruction, and Cloud GPU inference pipelines.",
+    "Portfolio of Pham Minh Chien — IT Student at Sai Gon University, aspiring AI Engineer seeking internship opportunities in Machine Learning, PyTorch pipelines, and backend APIs.",
   keywords: [
     "Pham Minh Chien",
-    "AI Engineer",
-    "Computer Vision",
-    "3D Reconstruction",
+    "AI Engineer Intern",
+    "Machine Learning",
+    "Deep Learning",
     "PyTorch",
     "FastAPI",
-    "Portfolio",
+    "AI Portfolio",
   ],
   authors: [{ name: "Pham Minh Chien" }],
   openGraph: {
-    title: "Pham Minh Chien | AI Engineer",
+    title: "Pham Minh Chien | Aspiring AI Engineer",
     description:
-      "Interactive portfolio showcasing AI engineering systems, 3D reconstruction, and cloud deployment.",
+      "Portfolio showcasing practical AI engineering, machine learning pipelines, and backend systems.",
     type: "website",
   },
 };

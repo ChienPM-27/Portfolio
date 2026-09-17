@@ -260,7 +260,7 @@ export function ProjectsHighlightsCarousel() {
             // 02 HIGHLIGHTS
           </span>
           <h2 className="font-display text-6xl sm:text-8xl md:text-9xl font-bold uppercase tracking-tight text-hud-white leading-[0.88]">
-            Professional
+            Featured
           </h2>
           <h2 className="font-display text-6xl sm:text-8xl md:text-9xl font-bold uppercase tracking-tight text-hud-muted/50 leading-[0.88] mt-2">
             Projects
@@ -283,7 +283,7 @@ export function ProjectsHighlightsCarousel() {
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
               <span className="font-mono text-xs tracking-widest text-hud-white uppercase font-semibold">
-                PROFESSIONAL PROJECTS // HIGHLIGHTS
+                FEATURED PROJECTS // HIGHLIGHTS
               </span>
             </div>
 

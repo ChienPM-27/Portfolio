@@ -24,9 +24,9 @@ export function AboutSection() {
           <div className="lg:col-span-6 flex flex-col gap-8">
             <div>
               <h2 className="font-display text-4xl sm:text-5xl font-semibold tracking-[0.04em] uppercase text-hud-white leading-[1.0]">
-                Engineering AI Systems
+                Aspiring AI Engineer
                 <br />
-                <span className="text-hud-muted">&amp; Cloud Inference</span>
+                <span className="text-hud-muted">&amp; IT Student</span>
               </h2>
               <p className="text-hud-muted mt-4 leading-relaxed text-sm sm:text-base font-normal">
                 {profile.summary}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, useRef } from "react";
 import Script from "next/script";
@@ -51,7 +51,7 @@ export function InteractiveOrb() {
               </div>
             </div>
             <span className="mt-4 font-mono text-[10px] tracking-widest text-hud-muted uppercase">
-              INITIALIZING 3D RECONSTRUCTION CORE...
+              INITIALIZING 3D INTERACTIVE CORE...
             </span>
           </div>
         )}

@@ -8,11 +8,11 @@ import { isReducedMotionPreferred } from "@/lib/scroll-utils";
 import { Github, ArrowUp, Mail } from "lucide-react";
 
 const MARQUEE_ITEMS = [
-  "COMPUTER VISION PIPELINES",
-  "SINGLE-IMAGE 3D RECONSTRUCTION",
-  "HIGH-THROUGHPUT GPU INFERENCE",
+  "AI ENGINEERING FUNDAMENTALS",
+  "MACHINE LEARNING & DEEP LEARNING",
   "PYTORCH & FASTAPI BACKENDS",
-  "REAL-TIME POINT CLOUD & MESH GENERATION",
+  "MODEL DEPLOYMENT & PIPELINES",
+  "SEEKING AI ENGINEER INTERNSHIP",
   "SAI GON UNIVERSITY // 2024–2029",
 ];
 
@@ -66,6 +66,8 @@ export function Footer() {
         {/* Identity & Origin */}
         <div className="flex flex-col sm:flex-row items-center gap-3 text-xs font-mono text-hud-dim text-center sm:text-left">
           <span className="font-semibold text-hud-white">{profile.name}</span>
+          <span className="hidden sm:inline">•</span>
+          <span>{profile.role}</span>
           <span className="hidden sm:inline">•</span>
           <span>{profile.education.institution}</span>
           <span className="hidden sm:inline">•</span>

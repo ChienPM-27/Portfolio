@@ -18,27 +18,28 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-const PROJECT_DOMAINS = [
-  "3D Reconstruction & Mesh",
-  "Computer Vision / YOLO",
-  "Cloud GPU Inference (L4)",
-  "FastAPI & PyTorch Backend",
-  "Mobile AI App (React Native)",
-  "Full-Stack AI System",
+const INQUIRY_TYPES = [
+  "AI Engineer Internship",
+  "Machine Learning & PyTorch",
+  "Model Deployment & FastAPI",
+  "Computer Vision Project",
+  "Full-Stack AI Application",
+  "General Mentorship & Connect",
 ];
 
 const TIMELINE_OPTIONS = [
-  "< 1 Month (Rapid Prototype)",
-  "1–3 Months (MVP / Full Pipeline)",
-  "Long-term / Full-Time Role",
+  "Immediate Start (Internship)",
+  "Summer / Upcoming Term",
+  "Part-time / Flexible Hours",
+  "Project-Based Collaboration",
 ];
 
 export function ContactSection() {
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [selectedDomain, setSelectedDomain] = useState(PROJECT_DOMAINS[0]);
-  const [timeline, setTimeline] = useState(TIMELINE_OPTIONS[1]);
+  const [selectedDomain, setSelectedDomain] = useState(INQUIRY_TYPES[0]);
+  const [timeline, setTimeline] = useState(TIMELINE_OPTIONS[0]);
   const [details, setDetails] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -61,7 +62,7 @@ export function ContactSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setErrorMsg("Please enter your name or company name.");
+      setErrorMsg("Please enter your name or company/team name.");
       return;
     }
     if (!email.trim() || !email.includes("@")) {
@@ -69,7 +70,7 @@ export function ContactSection() {
       return;
     }
     if (!details.trim()) {
-      setErrorMsg("Please describe your project scope, requirements, or goals.");
+      setErrorMsg("Please provide some details about the role, team, or project.");
       return;
     }
 
@@ -77,20 +78,20 @@ export function ContactSection() {
     setStatus("submitting");
 
     // Compose high-fidelity formatted email body
-    const emailSubject = `[Project Commission] ${selectedDomain} — ${name.trim()}`;
-    const emailBody = `PROJECT COMMISSION INQUIRY
+    const emailSubject = `[Internship / Project Inquiry] ${selectedDomain} — ${name.trim()}`;
+    const emailBody = `INTERNSHIP & PROJECT INQUIRY
 ==================================================
-Client / Organization: ${name.trim()}
-Contact Email: ${email.trim()}
-Domain / Specialization: ${selectedDomain}
-Target Timeline: ${timeline}
+From: ${name.trim()}
+Email: ${email.trim()}
+Topic / Opportunity: ${selectedDomain}
+Timeline / Availability: ${timeline}
 
-PROJECT BRIEF & TECHNICAL SPECIFICATIONS:
+MESSAGE & DETAILS:
 --------------------------------------------------
 ${details.trim()}
 
 ==================================================
-Dispatched via Portfolio Direct Project Portal
+Dispatched via Portfolio Direct Portal
 Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
 `;
 
@@ -122,7 +123,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
             // 04
           </span>
           <span className="font-display text-sm tracking-[0.2em] uppercase text-hud-muted">
-            Initiate Project &amp; Collaboration
+            Connect &amp; Internship Inquiries
           </span>
           <span className="w-12 h-[1px] bg-hud-dim/30" />
         </div>
@@ -132,13 +133,13 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
           <div className="lg:col-span-5 flex flex-col gap-6">
             <div>
               <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[0.04em] uppercase text-hud-white leading-[0.95]">
-                Have An AI Project?
+                Looking For An
                 <br />
-                <span className="text-cyber-red">Let&apos;s Build It.</span>
+                <span className="text-cyber-red">AI Intern?</span>
               </h2>
 
               <p className="text-sm sm:text-base text-hud-muted leading-relaxed font-normal mt-4">
-                Whether you need a single-image 3D reconstruction system, custom computer vision pipeline, or high-throughput cloud GPU inference backend — send me your project scope and specifications.
+                I am an Information Technology student actively seeking an AI Engineer Internship opportunity. Whether you have an internship opening, a project to collaborate on, or want to discuss machine learning workflows — feel free to reach out.
               </p>
             </div>
 
@@ -149,7 +150,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
-                <span>Available for Commissions &amp; Roles</span>
+                <span>Open for AI Engineer Internships</span>
               </div>
 
               <div className="flex items-center gap-4 text-xs font-mono text-hud-dim pt-1">
@@ -308,7 +309,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                   <div className="flex items-center justify-between border-b border-hud-dim/20 pb-4">
                     <div className="flex items-center gap-2 font-mono text-xs text-cyber-red tracking-widest uppercase font-semibold">
                       <Sparkles className="w-4 h-4" />
-                      <span>PROJECT COMMISSION FORM</span>
+                      <span>INTERNSHIP &amp; PROJECT INQUIRY</span>
                     </div>
                     <span className="font-mono text-[10px] text-hud-dim uppercase">
                       DIRECT INBOX DISPATCH
@@ -328,13 +329,13 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                     {/* Your Name */}
                     <div className="flex flex-col gap-2">
                       <label className="font-mono text-xs tracking-wider uppercase text-hud-muted flex items-center justify-between">
-                        <span>// 01. YOUR NAME *</span>
+                        <span>// 01. YOUR NAME / COMPANY *</span>
                       </label>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Alex Morgan / Company"
+                        placeholder="e.g. Alex Morgan / Team"
                         className="w-full bg-obsidian-surface/90 border border-hud-dim/30 rounded-lg px-4 py-3 text-sm font-mono text-hud-white placeholder:text-hud-dim/50 focus:border-cyber-red focus:outline-none focus:ring-1 focus:ring-cyber-red/40 transition-all"
                       />
                     </div>
@@ -354,13 +355,13 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                     </div>
                   </div>
 
-                  {/* Row 2: Project Domain / Specialization Chips */}
+                  {/* Row 2: Inquiry / Focus Type */}
                   <div className="flex flex-col gap-2.5">
                     <label className="font-mono text-xs tracking-wider uppercase text-hud-muted">
-                      // 03. SPECIALIZATION FOCUS
+                      // 03. INQUIRY / FOCUS TYPE
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {PROJECT_DOMAINS.map((domain) => {
+                      {INQUIRY_TYPES.map((domain) => {
                         const isSelected = selectedDomain === domain;
                         return (
                           <button
@@ -381,10 +382,10 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                     </div>
                   </div>
 
-                  {/* Row 3: Timeline & Engagement Options */}
+                  {/* Row 3: Timeline & Availability */}
                   <div className="flex flex-col gap-2.5">
                     <label className="font-mono text-xs tracking-wider uppercase text-hud-muted">
-                      // 04. ESTIMATED TIMELINE
+                      // 04. TIMELINE &amp; AVAILABILITY
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {TIMELINE_OPTIONS.map((opt) => {
@@ -411,14 +412,14 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                   {/* Row 4: Project Details & Requirements */}
                   <div className="flex flex-col gap-2">
                     <label className="font-mono text-xs tracking-wider uppercase text-hud-muted flex items-center justify-between">
-                      <span>// 05. PROJECT DETAILS &amp; REQUIREMENTS *</span>
-                      <span className="text-[10px] text-hud-dim">BE AS DETAILED AS POSSIBLE</span>
+                      <span>// 05. MESSAGE &amp; OPPORTUNITY DETAILS *</span>
+                      <span className="text-[10px] text-hud-dim">INTERNSHIP SCOPE OR PROJECT GOAL</span>
                     </label>
                     <textarea
                       rows={4}
                       value={details}
                       onChange={(e) => setDetails(e.target.value)}
-                      placeholder="Describe what you want to build: target inputs/outputs (e.g. photos, meshes, video feeds), desired latency/throughput, cloud vs edge requirements, or existing codebase..."
+                      placeholder="Describe the internship role, team, technical requirements, or project you'd like to collaborate on..."
                       className="w-full bg-obsidian-surface/90 border border-hud-dim/30 rounded-lg p-4 text-sm font-mono text-hud-white placeholder:text-hud-dim/50 focus:border-cyber-red focus:outline-none focus:ring-1 focus:ring-cyber-red/40 transition-all resize-y min-h-[110px]"
                     />
                   </div>
@@ -427,7 +428,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2 text-[11px] font-mono text-hud-dim">
                       <span className="w-1.5 h-1.5 rounded-full bg-cyber-red" />
-                      <span>Encrypted direct transmission to author</span>
+                      <span>Direct email transmission to author</span>
                     </div>
 
                     <button
@@ -443,7 +444,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
                         </>
                       ) : (
                         <>
-                          <span>DISPATCH PROJECT INQUIRY</span>
+                          <span>DISPATCH MESSAGE / INQUIRY</span>
                           <Send className="w-3.5 h-3.5" />
                         </>
                       )}
