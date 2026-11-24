@@ -1,189 +1,377 @@
 "use client";
 
 import React from "react";
-import { ProjectData } from "@/lib/types";
-import { Scan, Cpu, Layers, Box, ArrowUpRight } from "lucide-react";
+import { ProjectData, ProjectVisual } from "@/lib/types";
+import { signLanguageData } from "@/projects/sign-language-islr/data";
+import { getHeatmapCellClass } from "./heatmap-utils";
+import {
+  ArrowUpRight,
+  Database,
+  ShieldCheck,
+  GitBranch,
+  Cpu,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 
 interface ProjectPosterProps {
   project: ProjectData;
   index: number;
+  onPrefetch?: () => void;
+}
+
+const BADGE_STYLES: Record<
+  NonNullable<ProjectData["badge"]>["tone"],
+  { pill: string; dot: string; hairline: string }
+> = {
+  research: {
+    pill: "border-cyber-red/50 bg-cyber-red/15 text-[#ff6b6b]",
+    dot: "bg-cyber-red",
+    hairline: "from-cyber-red via-cyber-red/50 to-transparent",
+  },
+  award: {
+    pill: "border-amber-400/50 bg-amber-500/15 text-amber-300",
+    dot: "bg-amber-400",
+    hairline: "from-amber-400 via-amber-400/50 to-transparent",
+  },
+  live: {
+    pill: "border-emerald-400/50 bg-emerald-500/15 text-emerald-300",
+    dot: "bg-emerald-400",
+    hairline: "from-emerald-400 via-emerald-400/50 to-transparent",
+  },
+};
+
+function AblationMiniVisual() {
+  const matrix = signLanguageData.detailSections?.[0]?.matrix;
+  if (!matrix) return null;
+  const [hlRow, hlCol] = matrix.highlight ?? [0, 4];
+
+  return (
+    <div className="relative z-10 w-full h-full flex flex-col justify-between gap-2">
+      <div className="flex items-center justify-between text-[9px] font-mono text-hud-muted">
+        <span className="uppercase tracking-wider">6 Models × 7 Landmark Subsets</span>
+        <span className="text-[#ff6b6b] font-semibold">Val Macro-F1 (%)</span>
+      </div>
+
+      {/* Column headers */}
+      <div className="grid grid-cols-8 gap-1 items-center font-mono text-[8px] sm:text-[9px] text-hud-dim">
+        <span className="text-left pl-0.5">ARCH</span>
+        {matrix.columns.map((col) => (
+          <span key={col} className="text-center font-semibold text-hud-muted">
+            {col}
+          </span>
+        ))}
+      </div>
+
+      {/* 6x7 Matrix Cells */}
+      <div className="flex flex-col gap-1 my-auto">
+        {matrix.rows.map((row, rIdx) => (
+          <div
+            key={row.key}
+            className="grid grid-cols-8 gap-1 items-center font-mono text-[8px] sm:text-[9px] tabular-nums"
+          >
+            <span className="text-left truncate font-semibold text-hud-white/90 pr-1">
+              {row.key}
+            </span>
+            {row.values.map((val, cIdx) => {
+              const isHighlighted = rIdx === hlRow && cIdx === hlCol;
+              return (
+                <span
+                  key={cIdx}
+                  className={`py-1 rounded-[3px] text-center border leading-none ${getHeatmapCellClass(
+                    val,
+                    isHighlighted
+                  )}`}
+                >
+                  {val.toFixed(1)}
+                </span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Winner Callout Footer */}
+      <div className="flex items-center justify-between pt-1.5 border-t border-white/10 font-mono text-[9px]">
+        <span className="text-hud-white font-semibold truncate">
+          WINNER: <span className="text-cyber-red">T0__HF</span> • VAL 76.52%
+        </span>
+        <span className="text-emerald-400 font-semibold shrink-0">
+          TEST 87.30%
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MemoryFlowVisual() {
+  const steps = [
+    { id: "01", title: "SAVE + INTENT", sub: "Room SQLite", icon: Database },
+    { id: "02", title: "COSINE TOP-15", sub: "Zero-LLM Filter", icon: Cpu },
+    {
+      id: "03",
+      title: "GEMINI RESURFACE",
+      sub: "Rel > 0.80 Gate",
+      icon: Sparkles,
+    },
+    {
+      id: "04",
+      title: "CITED CHAT",
+      sub: "Verified Sources",
+      icon: ShieldCheck,
+    },
+  ];
+
+  return (
+    <div className="relative z-10 w-full h-full flex flex-col justify-between gap-2.5">
+      <div className="flex items-center justify-between text-[9px] font-mono">
+        <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/35 text-emerald-300">
+          ON-DEVICE ROOM
+        </span>
+        <span className="text-hud-dim">──▶</span>
+        <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-400/35 text-amber-300">
+          KTOR + GEMINI 2.5
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 my-auto">
+        {steps.map((step) => {
+          const Icon = step.icon;
+          return (
+            <div
+              key={step.id}
+              className="p-2.5 rounded bg-[#121829]/90 border border-white/10 flex flex-col gap-1"
+            >
+              <div className="flex items-center justify-between font-mono text-[9px]">
+                <span className="text-amber-400 font-bold">{step.id}</span>
+                <Icon className="w-3 h-3 text-hud-muted" />
+              </div>
+              <div className="font-mono text-[10px] font-semibold text-hud-white tracking-tight">
+                {step.title}
+              </div>
+              <div className="font-mono text-[9px] text-hud-dim truncate">
+                {step.sub}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-between pt-1.5 border-t border-white/10 font-mono text-[9px]">
+        <span className="text-hud-muted truncate">
+          100% LOCAL MEDIA / OCR / CHAT
+        </span>
+        <span className="text-amber-300 font-semibold shrink-0">
+          3-RETRY WORKER
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function CiPipelineVisual() {
+  const tiers = [
+    { layer: "NEXT.JS 15 PWA", target: "VERCEL EDGE CDN", badge: "< 10s ROLLBACK" },
+    { layer: "NESTJS 11 API", target: "RENDER + VNPAY", badge: "RBAC + PRISMA" },
+    { layer: "POSTGRES 16", target: "SUPABASE SINGAPORE", badge: "PITR ENABLED" },
+  ];
+
+  return (
+    <div className="relative z-10 w-full h-full flex flex-col justify-between gap-2.5">
+      <div className="flex items-center justify-between px-2.5 py-1.5 rounded bg-emerald-500/10 border border-emerald-400/30 font-mono text-[9px]">
+        <span className="flex items-center gap-1.5 text-emerald-300 font-semibold">
+          <GitBranch className="w-3 h-3" />
+          GH ACTIONS CI/CD
+        </span>
+        <span className="flex items-center gap-1 text-emerald-300 font-bold">
+          <CheckCircle2 className="w-3 h-3" />
+          22/22 FRs PASS
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-1.5 my-auto">
+        {tiers.map((tier) => (
+          <div
+            key={tier.layer}
+            className="flex items-center justify-between px-2.5 py-2 rounded bg-[#121829]/90 border border-white/10 font-mono text-[9px]"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+              <span className="text-hud-white font-semibold truncate">
+                {tier.layer}
+              </span>
+            </div>
+            <span className="text-hud-dim mx-1 hidden sm:inline">→</span>
+            <span className="text-emerald-300/90 font-medium truncate">
+              {tier.target}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between pt-1.5 border-t border-white/10 font-mono text-[9px]">
+        <span className="text-hud-muted truncate">
+          UNIT + PG INT + PLAYWRIGHT E2E
+        </span>
+        <span className="text-emerald-300 font-semibold shrink-0">
+          HTTPS LIVE
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function renderCardVisual(visual: ProjectVisual) {
+  switch (visual) {
+    case "ablation-matrix":
+      return <AblationMiniVisual />;
+    case "memory-flow":
+      return <MemoryFlowVisual />;
+    case "ci-pipeline":
+      return <CiPipelineVisual />;
+  }
 }
 
 /**
- * Authentic Logotomia-style architectural card poster.
- * Features 45-degree chamfered geometry, high-contrast typography,
- * telemetry vector symbols (o────── +), and distinct project visuals.
+ * Dark Obsidian Architectural HUD Card.
+ * Isolated with CSS containment (`contain: layout style paint`) to avoid
+ * page-wide reflows on hover and interaction.
  */
-export function ProjectPoster({ project, index }: ProjectPosterProps) {
-  const { slug, title, tagline, techStack } = project;
+export function ProjectPoster({
+  project,
+  index,
+  onPrefetch,
+}: ProjectPosterProps) {
+  const { title, category, badge, tagline, techStack, kpis, visual } = project;
   const num = String(index + 1).padStart(2, "0");
+  const tone = badge?.tone ?? "research";
+  const badgeStyle = BADGE_STYLES[tone];
+
+  const visibleTech = techStack.slice(0, 3);
+  const overflowCount = Math.max(0, techStack.length - visibleTech.length);
 
   return (
     <div
-      className="relative w-full h-full flex flex-col justify-between bg-[#ededed] text-[#0b0e1a] p-6 sm:p-8 select-none transition-transform duration-500 overflow-hidden shadow-2xl"
+      onMouseEnter={onPrefetch}
+      onFocus={onPrefetch}
+      className="relative w-full h-full flex flex-col justify-between bg-gradient-to-b from-[#13192b] to-[#0d111d] text-hud-white p-5 sm:p-6 select-none overflow-hidden shadow-2xl border border-white/10 group-hover:border-white/25 transition-colors duration-300"
       style={{
-        clipPath: "polygon(0 56px, 56px 0, 100% 0, 100% 100%, 0 100%)",
+        clipPath: "polygon(0 28px, 28px 0, 100% 0, 100% 100%, 0 100%)",
+        contain: "layout style paint",
       }}
     >
-      {/* Top Header: Title + Telemetry Symbol (o────── +) */}
-      <div className="relative z-10 flex items-start justify-between gap-4 mb-4">
-        <div className="flex flex-col pl-4 sm:pl-6">
-          <span className="font-mono text-[10px] tracking-[0.25em] text-[#0b0e1a]/60 uppercase font-semibold">
-            // PROJECT {num}
-          </span>
-          <h3 className="font-display text-2xl sm:text-4xl font-bold uppercase tracking-tight text-[#0b0e1a] leading-[0.95] mt-1">
-            {title}
-          </h3>
+      {/* Top Semantic Accent Hairline */}
+      <div
+        className={`absolute top-0 left-7 right-0 h-[2px] bg-gradient-to-r ${badgeStyle.hairline}`}
+        aria-hidden="true"
+      />
+
+      {/* Top-left Chamfer Corner Line */}
+      <svg
+        className="absolute top-0 left-0 w-8 h-8 text-white/20 pointer-events-none"
+        viewBox="0 0 32 32"
+        fill="none"
+        aria-hidden="true"
+      >
+        <line
+          x1="0"
+          y1="28"
+          x2="28"
+          y2="0"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+      </svg>
+
+      {/* Zone 1: Top Meta Row */}
+      <div className="relative z-10 flex items-center justify-between gap-2 pl-4">
+        <div className="flex items-center gap-2 min-w-0 font-mono text-[10px] tracking-wider uppercase text-hud-muted">
+          <span className="text-cyber-red font-bold">// {num}</span>
+          <span className="text-hud-dim">•</span>
+          <span className="truncate">{category}</span>
         </div>
 
-        {/* Logotomia Signature Vector Symbol: o────── + */}
-        <div className="flex items-center flex-shrink-0 pt-2 text-[#0b0e1a]/80">
-          <svg className="w-20 sm:w-24 h-6" viewBox="0 0 90 24" fill="none">
-            {/* Circle on the left */}
-            <circle cx="10" cy="12" r="5" stroke="currentColor" strokeWidth="1.2" />
-            {/* Connecting line */}
-            <line x1="15" y1="12" x2="72" y2="12" stroke="currentColor" strokeWidth="1.2" />
-            {/* Plus sign on the right */}
-            <line x1="80" y1="5" x2="80" y2="19" stroke="currentColor" strokeWidth="1.5" />
-            <line x1="73" y1="12" x2="87" y2="12" stroke="currentColor" strokeWidth="1.5" />
-          </svg>
-        </div>
+        {badge && (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border font-mono text-[9px] font-semibold uppercase tracking-wider shrink-0 ${badgeStyle.pill}`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${badgeStyle.dot}`} />
+            {badge.label}
+          </span>
+        )}
       </div>
 
-      {/* Central Visual Showcase Box (Chamfered Inner Window) */}
-      <div
-        className="relative flex-1 w-full my-2 bg-[#121726] rounded-sm overflow-hidden flex items-center justify-center p-6 border border-black/10 shadow-inner group-hover:scale-[1.01] transition-transform duration-500"
-        style={{
-          clipPath: "polygon(0 40px, 40px 0, 100% 0, 100% 100%, 0 100%)",
-        }}
-      >
-        {/* Subtle Background Art Texture */}
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-screen pointer-events-none filter grayscale contrast-150"
-          style={{ backgroundImage: "url('/assets/fond_art.png')" }}
-        />
+      {/* Zone 2: Title & Tagline */}
+      <div className="relative z-10 mt-3 mb-3">
+        <h3 className="font-display text-2xl sm:text-3xl font-semibold uppercase tracking-wide text-hud-white leading-[0.98] group-hover:text-white transition-colors">
+          {title}
+        </h3>
+        <p className="font-mono text-[11px] text-hud-muted mt-1.5 line-clamp-2 leading-relaxed">
+          {tagline}
+        </p>
+      </div>
 
-        {/* Ambient Grid lines */}
+      {/* Zone 3: Custom Data-Driven Visual Stage */}
+      <div className="relative flex-1 min-h-[190px] w-full rounded-md bg-[#090d18] border border-white/10 p-3.5 overflow-hidden flex flex-col justify-between">
+        {/* Subtle Background Blueprint Grid */}
         <div
-          className="absolute inset-0 opacity-15 pointer-events-none"
+          className="absolute inset-0 opacity-[0.07] pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
+              "linear-gradient(to right, rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.2) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
           }}
+          aria-hidden="true"
         />
 
-        {/* Dynamic Project-Specific Visual Graphic */}
-        {slug === "project-3d-reconstruction" ? (
-          // 3D Polyhedron Wireframe Mesh
-          <div className="relative z-10 flex flex-col items-center justify-center">
-            <div className="relative w-40 h-40 flex items-center justify-center">
-              <svg viewBox="0 0 180 180" fill="none" className="w-full h-full text-hud-white">
-                <polygon
-                  points="90,18 155,55 155,125 90,162 25,125 25,55"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="opacity-60"
-                />
-                <line x1="90" y1="18" x2="90" y2="90" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="155" y1="55" x2="90" y2="90" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="25" y1="55" x2="90" y2="90" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="90" y1="90" x2="90" y2="162" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="90" y1="90" x2="155" y2="125" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="90" y1="90" x2="25" y2="125" stroke="currentColor" strokeWidth="1.5" />
-                {/* Vertex Pulsing Keypoints */}
-                <circle cx="90" cy="90" r="4" fill="#e61e1e" className="animate-ping" />
-                <circle cx="90" cy="90" r="4" fill="#e61e1e" />
-                <circle cx="90" cy="18" r="3" fill="#ffffff" />
-                <circle cx="155" cy="55" r="3" fill="#ffffff" />
-                <circle cx="25" cy="55" r="3" fill="#ffffff" />
-                <circle cx="90" cy="162" r="3" fill="#ffffff" />
-              </svg>
-            </div>
-            <span className="font-mono text-[10px] tracking-[0.2em] text-cyber-red uppercase font-semibold mt-2">
-              WATERTIGHT MESH SYNTHESIS
-            </span>
-          </div>
-        ) : slug === "project-vision-segmentation" ? (
-          // Computer Vision Bounding Box & Target Radar
-          <div className="relative z-10 w-48 h-36 border-2 border-cyber-red/80 rounded bg-cyber-red/10 flex flex-col justify-between p-3 font-mono">
-            <div className="flex items-center justify-between text-[10px] text-cyber-red font-bold">
-              <span>[ YOLOv8: 98.4% ]</span>
-              <span>IoU: 0.98</span>
-            </div>
-            <div className="my-auto flex items-center justify-center">
-              <Scan className="w-12 h-12 text-hud-white animate-pulse" />
-            </div>
-            <div className="flex justify-between text-[9px] text-hud-muted">
-              <span>X: 142 Y: 86</span>
-              <span>CONFIDENCE: MAX</span>
-            </div>
-          </div>
-        ) : slug === "project-cloud-gpu-pipeline" || slug === "project-cloud-inference" ? (
-          // GPU Server Telemetry Box
-          <div className="relative z-10 w-52 flex flex-col gap-2 p-4 rounded bg-obsidian-surface border border-hud-dim/40 font-mono">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 text-hud-white font-bold">
-                <Cpu className="w-4 h-4 text-cyber-red" /> L4 GPU NODE
-              </span>
-              <span className="text-emerald-400 font-bold">18.4 GB</span>
-            </div>
-            <div className="w-full bg-obsidian h-2 rounded-full overflow-hidden mt-1">
-              <div className="bg-cyber-red h-full rounded-full w-[78%]" />
-            </div>
-            <div className="flex justify-between text-[10px] text-hud-muted pt-1">
-              <span>FASTAPI ASYNC</span>
-              <span>28ms LATENCY</span>
-            </div>
-          </div>
-        ) : (
-          // KeySmith Telemetry Dashboard
-          <div className="relative z-10 grid grid-cols-2 gap-3 w-52 font-mono">
-            <div className="p-3 rounded bg-obsidian-surface border border-hud-dim/40">
-              <span className="text-[10px] text-hud-muted block">SYNC REVENUE</span>
-              <span className="text-base font-bold text-hud-white mt-1 block">$43.3k</span>
-            </div>
-            <div className="p-3 rounded bg-obsidian-surface border border-hud-dim/40">
-              <span className="text-[10px] text-hud-muted block">ORDERS SYNC</span>
-              <span className="text-base font-bold text-cyber-red mt-1 block">+350</span>
-            </div>
-          </div>
-        )}
+        {renderCardVisual(visual)}
 
-        {/* Hover Action Overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-          <span className="px-4 py-2 rounded-full bg-white text-black font-mono text-xs font-semibold tracking-wider uppercase shadow-xl flex items-center gap-1.5">
-            EXPAND DEEP DIVE <ArrowUpRight className="w-3.5 h-3.5" />
+        {/* Unobtrusive Hover Deep-Dive Pill */}
+        <div className="pointer-events-none absolute right-2.5 bottom-2.5 z-20 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-[#0b0e1a] font-mono text-[9px] font-bold uppercase tracking-wider shadow-lg">
+            INSPECT DEEP DIVE
+            <ArrowUpRight className="w-3 h-3" />
           </span>
         </div>
       </div>
 
-      {/* Bottom Footer: Tagline + Tech Tags + Number */}
-      <div className="relative z-10 pt-3 flex items-end justify-between border-t border-[#0b0e1a]/15 text-[#0b0e1a]">
-        <div className="flex flex-col gap-1 max-w-[75%]">
-          <p className="font-mono text-xs font-medium line-clamp-1 text-[#0b0e1a]">
-            {tagline}
-          </p>
-          <div className="flex items-center gap-2 font-mono text-[10px] text-[#0b0e1a]/70">
-            <span>{techStack[0]}</span>
-            {techStack[1] && (
-              <>
-                <span>•</span>
-                <span>{techStack[1]}</span>
-              </>
-            )}
-            {techStack[2] && (
-              <>
-                <span>•</span>
-                <span>{techStack[2]}</span>
-              </>
-            )}
-          </div>
+      {/* Zone 4: 3-Column KPI Strip + Tech Footer */}
+      <div className="relative z-10 mt-3 flex flex-col gap-2.5">
+        <div className="grid grid-cols-3 gap-2">
+          {kpis.slice(0, 3).map((kpi) => (
+            <div
+              key={kpi.label}
+              className="px-2.5 py-2 rounded bg-[#090d18]/90 border border-white/10 flex flex-col justify-between"
+            >
+              <span className="font-mono text-xs sm:text-sm font-bold text-hud-white tabular-nums truncate">
+                {kpi.value}
+              </span>
+              <span className="font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-hud-dim truncate mt-0.5">
+                {kpi.label}
+              </span>
+            </div>
+          ))}
         </div>
 
-        <div className="flex items-center gap-1 font-mono text-sm font-bold text-[#0b0e1a]">
-          <span>{num}</span>
-          <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+        <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 overflow-hidden font-mono text-[9px] text-hud-muted">
+            {visibleTech.map((tech) => (
+              <span
+                key={tech}
+                className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 truncate max-w-[100px]"
+              >
+                {tech}
+              </span>
+            ))}
+            {overflowCount > 0 && (
+              <span className="text-hud-dim shrink-0">+{overflowCount}</span>
+            )}
+          </div>
+
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-hud-white group-hover:text-cyber-red transition-colors shrink-0">
+            DEEP DIVE
+            <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </span>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ export function Navigation() {
     <header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled
-          ? "bg-obsidian/90 backdrop-blur-xl border-b border-hud-dim/20"
+          ? "bg-[#0b0e1a]/95 border-b border-hud-dim/20"
           : "bg-transparent"
       }`}
     >

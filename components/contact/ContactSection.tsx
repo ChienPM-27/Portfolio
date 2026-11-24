@@ -115,7 +115,10 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
   };
 
   return (
-    <section id="contact" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto relative z-10">
+    <section
+      id="contact"
+      className="defer-below-fold-contact py-20 sm:py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto relative z-10"
+    >
       <div className="border-t border-hud-dim/20 pt-16">
         {/* Section Header */}
         <div className="flex items-center gap-3 mb-12">
@@ -248,7 +251,7 @@ Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short"
 
           {/* Right Column: Direct Interactive Project Inquiry Form */}
           <div className="lg:col-span-7">
-            <div className="relative rounded-2xl bg-obsidian-light/95 border border-hud-dim/30 p-6 sm:p-8 md:p-10 backdrop-blur-xl shadow-2xl">
+            <div className="relative rounded-2xl bg-[#101524] border border-hud-dim/30 p-6 sm:p-8 md:p-10 shadow-2xl">
               {/* Subtle Chamfer Ambient Corner Accent */}
               <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden">
                 <div className="absolute -top-8 -right-8 w-16 h-16 bg-cyber-red/10 rotate-45 border-b border-cyber-red/40" />

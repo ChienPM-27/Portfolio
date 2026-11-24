@@ -1,46 +1,65 @@
+import dynamic from "next/dynamic";
 import { Navigation } from "@/components/shell/Navigation";
 import { Hero } from "@/components/hero/Hero";
-import { ProjectsHighlightsCarousel } from "@/components/projects/ProjectsHighlightsCarousel";
-import { AboutSection } from "@/components/about/AboutSection";
-import { ContactSection } from "@/components/contact/ContactSection";
-import { Footer } from "@/components/shell/Footer";
+import { ClientChrome } from "@/components/shell/ClientChrome";
 import { TechnicalBackground } from "@/components/shell/TechnicalBackground";
-import { TechnicalCursor } from "@/components/shell/TechnicalCursor";
+import {
+  ProjectsCarouselSkeleton,
+  AboutSectionSkeleton,
+  ContactSectionSkeleton,
+} from "@/components/ui/Skeletons";
 import { ProjectDetailProvider } from "@/lib/project-detail-context";
-import { ImmersiveProjectDetail } from "@/components/projects/ImmersiveProjectDetail";
+
+const ProjectsHighlightsCarousel = dynamic(
+  () =>
+    import("@/components/projects/ProjectsHighlightsCarousel").then(
+      (m) => m.ProjectsHighlightsCarousel
+    ),
+  { loading: () => <ProjectsCarouselSkeleton /> }
+);
+
+const AboutSection = dynamic(
+  () =>
+    import("@/components/about/AboutSection").then((m) => m.AboutSection),
+  { loading: () => <AboutSectionSkeleton /> }
+);
+
+const ContactSection = dynamic(
+  () =>
+    import("@/components/contact/ContactSection").then(
+      (m) => m.ContactSection
+    ),
+  { loading: () => <ContactSectionSkeleton /> }
+);
+
+const Footer = dynamic(() =>
+  import("@/components/shell/Footer").then((m) => m.Footer)
+);
 
 export default function Home() {
   return (
     <ProjectDetailProvider>
       <div className="relative flex flex-col min-h-screen bg-obsidian text-hud-white overflow-x-clip">
-        {/* Immersive Scroll-Hijacked Detail View for Projects */}
-        <ImmersiveProjectDetail />
-      {/* Reusable Canvas 2D Technical Multi-Layer Background */}
-      <TechnicalBackground />
+        <TechnicalBackground />
+        <ClientChrome />
 
-      {/* Interactive Custom Technical Cursor (Desktop Only - Snappy & Zero-Lag) */}
-      <TechnicalCursor />
+        {/* Minimal Navigation */}
+        <Navigation />
 
-      {/* Minimal Navigation */}
-      <Navigation />
+        <main className="flex-1 flex flex-col z-10">
+          {/* Above-the-fold Hero */}
+          <Hero />
 
-      <main className="flex-1 flex flex-col z-10">
-        {/* Editorial Minimal Hero with Dual Gateway & 3D Interactive Core */}
-        <Hero />
+          {/* Code-split Highlights Carousel */}
+          <ProjectsHighlightsCarousel />
 
-        {/* Logotomia-inspired Dynamic Momentum Drag Carousel */}
-        <ProjectsHighlightsCarousel />
+          {/* Deferred Below-the-Fold Sections */}
+          <AboutSection />
+          <ContactSection />
+        </main>
 
-        {/* Editorial About & Background */}
-        <AboutSection />
-
-        {/* Dedicated Contact Section */}
-        <ContactSection />
-      </main>
-
-      {/* Grounded Footer & Telemetry */}
-      <Footer />
-    </div>
-  </ProjectDetailProvider>
+        <Footer />
+      </div>
+    </ProjectDetailProvider>
   );
 }

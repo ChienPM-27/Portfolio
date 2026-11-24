@@ -98,8 +98,8 @@ export function Hero() {
           ref={orbWrapperRef}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center pointer-events-auto"
           style={{
-            width: "min(1150px, 90vh, 98vw)",
-            height: "min(1150px, 90vh, 98vw)",
+            width: "min(760px, 72vh, 90vw)",
+            height: "min(760px, 72vh, 90vw)",
           }}
         >
           <InteractiveOrb />

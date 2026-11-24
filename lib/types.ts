@@ -1,5 +1,3 @@
-import type { ComponentType } from "react";
-
 export interface ProjectLink {
   label: string;
   url: string;
@@ -11,41 +9,45 @@ export interface ProjectMetric {
   value: string;
 }
 
+/** Numeric matrix rendered as a heatmap (e.g. an ablation study grid). */
+export interface HeatmapMatrix {
+  caption: string;
+  unit: string;
+  columns: string[];
+  rows: { key: string; label: string; values: number[] }[];
+  /** [rowIndex, columnIndex] of the cell to emphasise (e.g. the winner). */
+  highlight?: [number, number];
+}
+
 export interface ProjectDetailSection {
   heading: string;
+  shortTitle?: string;
   points: string[];
+  matrix?: HeatmapMatrix;
 }
+
+/** Which data-driven visual the project card renders. */
+export type ProjectVisual = "ablation-matrix" | "memory-flow" | "ci-pipeline";
 
 export interface ProjectData {
   slug: string;
   title: string;
+  category: string;
+  /** Optional emphasis badge, e.g. an award or "live in production". */
+  badge?: { label: string; tone: "award" | "live" | "research" };
   tagline: string;
   description: string;
   role: string;
   period: string;
   techStack: string[];
+  /** Three short headline numbers shown on the card. */
+  kpis: ProjectMetric[];
+  /** Longer metrics shown in the detail overview. */
   metrics?: ProjectMetric[];
   links: ProjectLink[];
-  poster?: string;
-  previewGradient?: string;
-  /**
-   * Optional deep-dive content shown in the "View System Design" modal.
-   * Each section renders as a labeled block of bullet points — e.g. one
-   * section per architecture layer (Mobile, Server, Backend, Frontend).
-   * If omitted, ProjectDetails will not render a "View System Design" button.
-   */
+  visual: ProjectVisual;
+  /** Deep-dive panels shown in the immersive detail view. */
   detailSections?: ProjectDetailSection[];
-}
-
-export interface VisualSceneProps {
-  progress: number;
-  isActive: boolean;
-  direction?: number;
-}
-
-export interface ProjectDefinition {
-  data: ProjectData;
-  Scene: ComponentType<VisualSceneProps>;
 }
 
 export interface ProfileEducation {

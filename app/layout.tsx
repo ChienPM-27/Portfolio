@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif, Teko } from "next/font/google";
-import { LoadingScreen } from "@/components/shell/LoadingScreen";
+import { Inter, Teko } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,39 +8,32 @@ const inter = Inter({
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
 const teko = Teko({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Pham Minh Chien | Aspiring AI Engineer",
+  title: "Pham Minh Chien | AI Engineer & Systems Portfolio",
   description:
-    "Portfolio of Pham Minh Chien — IT Student at Sai Gon University, aspiring AI Engineer seeking internship opportunities in Machine Learning, PyTorch pipelines, and backend APIs.",
+    "Portfolio of Pham Minh Chien — IT Student at Sai Gon University building PyTorch ML pipelines, Local-First Android AI systems, and production Next.js/NestJS applications.",
   keywords: [
     "Pham Minh Chien",
     "AI Engineer Intern",
     "Machine Learning",
-    "Deep Learning",
+    "Sign Language Recognition",
     "PyTorch",
-    "FastAPI",
-    "AI Portfolio",
+    "Kotlin Android AI",
+    "Next.js",
+    "NestJS",
   ],
   authors: [{ name: "Pham Minh Chien" }],
   openGraph: {
-    title: "Pham Minh Chien | Aspiring AI Engineer",
+    title: "Pham Minh Chien | AI Engineer & Systems Portfolio",
     description:
-      "Portfolio showcasing practical AI engineering, machine learning pipelines, and backend systems.",
+      "Featured projects: Sign Language Recognition (42-Config Ablation), Remora Screenshot Memory (Top 7 Hackathon), and BrewLite PWA.",
     type: "website",
   },
 };
@@ -61,10 +53,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${inter.variable} ${instrumentSerif.variable} ${teko.variable}`}
+      className={`dark ${inter.variable} ${teko.variable}`}
     >
+      <head>
+        <link
+          rel="preconnect"
+          href="https://prod.spline.design"
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href="https://unpkg.com" />
+      </head>
       <body className="bg-obsidian text-white min-h-screen selection:bg-cyber-red/20 selection:text-cyber-red font-sans antialiased">
-        <LoadingScreen />
         {children}
       </body>
     </html>

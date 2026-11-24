@@ -1,14 +1,22 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { projects } from "@/projects/registry";
 import { useProjectDetail } from "@/lib/project-detail-context";
 import { ProjectPoster } from "./ProjectPoster";
+import { prefetchProjectDetail } from "./LazyProjectDetail";
 import { useGSAP } from "@/lib/gsap";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const SHORT_PILL_NAMES: Record<string, string> = {
+  "sign-language-islr": "ISLR",
+  "remora-production": "REMORA",
+  brewlite: "BREWLITE",
+};
 
 export function ProjectsHighlightsCarousel() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,17 +26,27 @@ export function ProjectsHighlightsCarousel() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const [activeIndex, setActiveIndex] = useState(1);
   const { openProject } = useProjectDetail();
 
   const hasMovedRef = useRef(false);
 
-  // ScrollTrigger Pin & Scrub Transition:
-  // When section hits top of viewport (title is centered in 100vh) -> Pins section ->
-  // Phase 1: Scrub down fades title left & reveals cards from left to right ->
-  // Phase 2: Continues scrub to glide horizontally across cards ->
-  // Phase 3: Smooth unpin into #projects without any DOM overlap.
+  const scrollToCard = useCallback((idx: number) => {
+    const st =
+      ScrollTrigger.getById("projects-highlights-st") ??
+      scrollTriggerRef.current;
+    if (!st) return;
+    const clampedIdx = Math.min(Math.max(idx, 0), projects.length - 1);
+    const targetProgress =
+      projects.length <= 1
+        ? 0.3
+        : 0.28 + (clampedIdx / (projects.length - 1)) * 0.54;
+    const targetY = st.start + (st.end - st.start) * targetProgress;
+    window.scrollTo({ top: targetY, behavior: "smooth" });
+  }, []);
+
   useGSAP(
     () => {
       const container = containerRef.current;
@@ -37,16 +55,18 @@ export function ProjectsHighlightsCarousel() {
       const track = trackRef.current;
       const viewport = viewportRef.current;
       const thumb = thumbRef.current;
-      if (!container || !titleWrapper || !cardsWrapper || !track || !viewport) return;
+      if (!container || !titleWrapper || !cardsWrapper || !track || !viewport)
+        return;
 
       const tl = gsap.timeline({
         scrollTrigger: {
+          id: "projects-highlights-st",
           trigger: container,
           start: "top top",
-          end: "+=2400",
+          end: "+=1100",
           pin: true,
           pinSpacing: true,
-          scrub: 1,
+          scrub: 0.2,
           anticipatePin: 1,
           refreshPriority: 10,
           invalidateOnRefresh: true,
@@ -66,13 +86,14 @@ export function ProjectsHighlightsCarousel() {
         },
       });
 
-      // PHASE 1 (0 to 0.28): Title fades & sweeps left FIRST, then Cards stagger in from left to right
+      scrollTriggerRef.current = tl.scrollTrigger ?? null;
+
+      // PHASE 1 (0 to 0.28): Title fades & sweeps left, then cards stagger in
       tl.to(
         titleWrapper,
         {
           x: () => -Math.max(window.innerWidth * 0.6, 750),
           autoAlpha: 0,
-          filter: "blur(14px)",
           ease: "power2.in",
           duration: 0.12,
         },
@@ -90,7 +111,6 @@ export function ProjectsHighlightsCarousel() {
         0.08
       );
 
-      // Top and bottom telemetry fade in
       tl.fromTo(
         ".telemetry-hud",
         { opacity: 0, y: -8 },
@@ -98,7 +118,6 @@ export function ProjectsHighlightsCarousel() {
         0.1
       );
 
-      // Individual cards stagger in from left to right: 01 -> 02 -> 03 -> 04
       tl.fromTo(
         ".highlight-card",
         {
@@ -117,7 +136,7 @@ export function ProjectsHighlightsCarousel() {
         0.1
       );
 
-      // PHASE 2 (0.28 to 0.86): Scrub horizontal track across the 4 cards
+      // PHASE 2 (0.28 to 0.86): Scrub horizontal track across the 3 cards
       tl.to(
         track,
         {
@@ -131,12 +150,15 @@ export function ProjectsHighlightsCarousel() {
         0.28
       );
 
-      // Progress bar indicator tracks the horizontal travel
       if (thumb) {
         tl.to(
           thumb,
           {
-            x: 200 - 48,
+            x: () =>
+              Math.max(
+                0,
+                (thumb.parentElement?.clientWidth ?? 192) - thumb.clientWidth
+              ),
             ease: "none",
             duration: 0.58,
           },
@@ -144,7 +166,7 @@ export function ProjectsHighlightsCarousel() {
         );
       }
 
-      // PHASE 3 (0.86 to 1.0): Cards layer cleanly fades out before unpinning so subsequent section enters pure
+      // PHASE 3 (0.88 to 1.0): Cards layer fades out cleanly before unpinning
       tl.to(
         cardsWrapper,
         {
@@ -161,8 +183,7 @@ export function ProjectsHighlightsCarousel() {
     { scope: containerRef }
   );
 
-  // Unified Mouse Drag & Touch Swipe:
-  // Converts horizontal drag into window scroll, seamlessly driving the exact same GSAP scrub!
+  // Unified Mouse Drag & Touch Swipe
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -185,9 +206,8 @@ export function ProjectsHighlightsCarousel() {
       if (Math.abs(dx) > 6) {
         hasMovedRef.current = true;
       }
-      const scrollFactor = 2.0;
       window.scrollTo({
-        top: startScrollY - dx * scrollFactor,
+        top: startScrollY - dx * 2.0,
         behavior: "instant" as ScrollBehavior,
       });
     };
@@ -239,22 +259,24 @@ export function ProjectsHighlightsCarousel() {
       id="projects"
       className="relative w-full bg-obsidian border-t border-hud-dim/20 z-20"
     >
-      <div id="projects-highlights" className="absolute top-0 left-0 pointer-events-none" />
-      {/* Pinned Stage Viewport (Locks cleanly in screen during the scrub sequence) */}
+      <div
+        id="projects-highlights"
+        className="absolute top-0 left-0 pointer-events-none"
+      />
+      {/* Pinned Stage Viewport */}
       <div
         ref={pinStageRef}
         className="relative w-full h-screen overflow-hidden flex items-center justify-center"
       >
-        {/* Subtle Ambient Radial Backlight */}
         <div
           className="absolute inset-0 bg-radial from-obsidian-surface/30 via-obsidian to-obsidian pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* LAYER 1: Title in Center (Initial View -> Transitions & Fades Left on Scroll, z-10) */}
+        {/* LAYER 1: Title in Center */}
         <div
           ref={titleWrapperRef}
-          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none z-10 select-none will-change-transform"
+          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none z-10 select-none"
         >
           <span className="font-mono text-xs sm:text-sm tracking-[0.3em] text-cyber-red uppercase mb-4 font-semibold">
             // 02 HIGHLIGHTS
@@ -273,13 +295,13 @@ export function ProjectsHighlightsCarousel() {
           </div>
         </div>
 
-        {/* LAYER 2: Cards Layer (Slides in from Right as Title Fades Left, z-20) */}
+        {/* LAYER 2: Cards Layer */}
         <div
           ref={cardsWrapperRef}
-          className="relative z-20 w-full h-full flex flex-col justify-between py-8 sm:py-12 px-4 sm:px-10 will-change-transform"
+          className="relative z-20 w-full h-full flex flex-col justify-between pt-20 sm:pt-24 pb-6 sm:pb-8 px-4 sm:px-10"
         >
           {/* Top Telemetry Header inside Pinned Stage */}
-          <div className="telemetry-hud max-w-7xl mx-auto w-full flex items-center justify-between px-4 z-30 flex-shrink-0">
+          <div className="telemetry-hud max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between gap-3 px-4 z-30 flex-shrink-0">
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
               <span className="font-mono text-xs tracking-widest text-hud-white uppercase font-semibold">
@@ -287,22 +309,58 @@ export function ProjectsHighlightsCarousel() {
               </span>
             </div>
 
-            {/* Drag Action Indicator */}
-            <div className="flex items-center gap-3 font-mono text-xs tracking-widest text-hud-white uppercase select-none">
-              <span className="font-semibold text-cyber-red">DRAG TO INSPECT</span>
-              <svg
-                className="w-10 h-4 text-hud-white animate-[bounceRight_1.8s_infinite_ease-in-out]"
-                viewBox="0 0 64 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+            {/* Project Quick-Selector Pills */}
+            <div className="hidden md:flex items-center gap-1.5 font-mono text-[10px]">
+              {projects.map((proj, idx) => {
+                const isActive = activeIndex === idx + 1;
+                const shortLabel =
+                  SHORT_PILL_NAMES[proj.slug] ??
+                  proj.title.split(" ")[0].toUpperCase();
+                return (
+                  <button
+                    key={proj.slug}
+                    type="button"
+                    onClick={() => scrollToCard(idx)}
+                    data-cursor="pointer"
+                    className={`px-2.5 py-1 rounded-full border transition-colors ${
+                      isActive
+                        ? "border-cyber-red bg-cyber-red/20 text-hud-white"
+                        : "border-hud-dim/30 bg-obsidian-surface/60 text-hud-muted hover:text-hud-white hover:border-hud-dim/60"
+                    }`}
+                  >
+                    0{idx + 1} {shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Drag / Prev-Next Controls */}
+            <div className="flex items-center gap-2 font-mono text-xs tracking-widest text-hud-white uppercase select-none">
+              <span className="hidden sm:inline font-semibold text-cyber-red mr-1">
+                DRAG OR CLICK
+              </span>
+              <button
+                type="button"
+                onClick={() => scrollToCard(Math.max(0, activeIndex - 2))}
+                disabled={activeIndex <= 1}
+                aria-label="Previous project"
+                data-cursor="pointer"
+                className="p-1.5 rounded-full border border-hud-dim/30 bg-obsidian-surface/70 text-hud-white hover:border-cyber-red/60 disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
               >
-                <path
-                  d="M0 10H58M58 10L48 2M58 10L48 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  scrollToCard(Math.min(projects.length - 1, activeIndex))
+                }
+                disabled={activeIndex >= projects.length}
+                aria-label="Next project"
+                data-cursor="pointer"
+                className="p-1.5 rounded-full border border-hud-dim/30 bg-obsidian-surface/70 text-hud-white hover:border-cyber-red/60 disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
@@ -319,28 +377,35 @@ export function ProjectsHighlightsCarousel() {
             >
               {projects.map((proj, idx) => (
                 <article
-                  key={proj.data.slug}
+                  key={proj.slug}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open deep dive for ${proj.title}`}
                   onClick={() => {
                     if (!hasMovedRef.current) {
-                      openProject(proj.data.slug);
+                      openProject(proj.slug);
                     }
                   }}
-                  className="highlight-card group relative w-[320px] sm:w-[460px] md:w-[540px] lg:w-[600px] h-[480px] sm:h-[540px] md:h-[580px] flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.015]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openProject(proj.slug);
+                    }
+                  }}
+                  className="highlight-card group relative w-[330px] sm:w-[460px] md:w-[540px] lg:w-[580px] h-[470px] sm:h-[510px] md:h-[530px] flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.015] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyber-red"
                 >
-                  <ProjectPoster project={proj.data} index={idx} />
+                  <ProjectPoster
+                    project={proj}
+                    index={idx}
+                    onPrefetch={prefetchProjectDetail}
+                  />
                 </article>
               ))}
-            </div>
-
-            {/* Logotomia Signature Floating "Drag" Circle Badge */}
-            <div className="absolute right-12 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white text-[#0b0e1a] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center shadow-2xl pointer-events-none z-30 border border-black/10">
-              Drag
             </div>
           </div>
 
           {/* Bottom Progress Bar & Slide Counter */}
           <div className="telemetry-hud max-w-7xl mx-auto w-full flex items-center justify-between px-4 flex-shrink-0">
-            {/* Track Line */}
             <div className="relative w-48 sm:w-64 h-[2px] bg-hud-dim/30 rounded-full overflow-hidden">
               <div
                 ref={thumbRef}
@@ -348,9 +413,9 @@ export function ProjectsHighlightsCarousel() {
               />
             </div>
 
-            {/* Slide Counter */}
             <div className="font-mono text-xs tracking-widest text-hud-muted">
-              <span className="text-hud-white font-bold">0{activeIndex}</span> / 0{projects.length}
+              <span className="text-hud-white font-bold">0{activeIndex}</span> / 0
+              {projects.length}
             </div>
           </div>
         </div>

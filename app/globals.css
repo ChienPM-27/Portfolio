@@ -27,7 +27,6 @@
 html {
   background-color: var(--background);
   color: var(--foreground);
-  scroll-behavior: smooth;
   overflow-x: clip;
 }
 
@@ -213,4 +212,47 @@ body {
   border-color: #e61e1e;
   background: rgba(230, 30, 30, 0.3);
   box-shadow: 0 0 8px rgba(230, 30, 30, 0.4);
+}
+
+/* Loading Skeleton Shimmer (respects reduced motion) */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.045) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
+}
+
+/* Defer layout/paint for below-the-fold sections (paired with intrinsic sizing to avoid CLS) */
+.defer-below-fold-about {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 760px;
+}
+
+.defer-below-fold-contact {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 840px;
+}
+
+.defer-below-fold-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 260px;
 }

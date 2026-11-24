@@ -17,7 +17,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "AI & Machine Learning": Cpu,
   "Backend & Systems": Server,
   "Mobile & Web": Smartphone,
-  "Cloud & Environments": Terminal,
+  "Cloud & DevOps": Terminal,
 };
 
 export function AboutSection() {
@@ -69,7 +69,7 @@ export function AboutSection() {
     <section
       ref={containerRef}
       id="about"
-      className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto relative z-10"
+      className="defer-below-fold-about py-20 sm:py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto relative z-10"
     >
       <div className="border-t border-hud-dim/20 pt-16">
         {/* Section Header */}

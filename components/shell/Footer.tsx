@@ -41,7 +41,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative z-20 border-t border-hud-dim/20 pt-12 pb-20 bg-obsidian-light/95 backdrop-blur-md flex flex-col gap-12 overflow-hidden">
+    <footer className="defer-below-fold-footer relative z-20 border-t border-hud-dim/20 pt-12 pb-20 bg-[#101524] flex flex-col gap-12 overflow-hidden">
       {/* Infinite Horizontal Marquee Text Loop */}
       <div className="w-full overflow-hidden border-y border-hud-dim/15 py-3 sm:py-4 bg-obsidian/80 select-none">
         <div
