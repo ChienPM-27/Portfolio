@@ -1,42 +1,11 @@
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-Thumbs.db
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
-.env
-
-# vercel
-.vercel
-
-# analysis & preview artifacts
-/glee-analysis/
-/glee-preview/
-
-# typescript
+node_modules/
+.next/
+.next-dev/
+out/
+.vercel/
+.env*
+!.env.example
 *.tsbuildinfo
 next-env.d.ts
-.vercel
-.env*
+*.log
+.DS_Store
